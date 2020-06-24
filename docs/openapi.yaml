@@ -1,0 +1,23 @@
+openapi: 3.0.0
+info:
+  title: 'Ame Digital - Weather API'
+  version: '1.0'
+  description: 'Projeto
+  contact:
+    name: 'Ame Digital - Weather API'
+    email: amedigital@exactaworks.com
+    url: 'http://www.amedigital.com/'
+  license:
+    name: AME
+tags:
+  - name: weather
+    description: Refere-se a busca
+paths:
+  /weather:
+    get:
+      operationId: findWeather
+      summary: 'Busca'
+      tags:
+        - weather
+      responses:
+        '200'

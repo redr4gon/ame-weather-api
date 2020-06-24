@@ -1,0 +1,53 @@
+# Application context-Path:
+server:
+  port: 9090
+
+ame:
+  context-path: /weather
+  email:
+    host: host
+    username: username
+    password: password
+    sender: sender@sender.com
+    port: 587
+
+spring:
+  profiles: test
+  datasource:
+    url: jdbc:h2:mem:DB_weather;MODE=MYSQL
+      jdbc:h2:mem:DB_weather;DB_CLOSE_DELAY=-1;MODE=MYSQL;TRACE_LEVEL_SYSTEM_OUT=2
+    username: db_weather
+    password: db_weather
+    hikari:
+      maximumPoolSize: 4
+  flyway:
+    url: jdbc:h2:mem:DB_weather;MODE=MYSQL
+    validate-on-migrate: false
+    enabled: false
+
+# Webflux retry configuration
+retryable:
+  max-retries: 5
+  min-duration: 5
+  max-duration: 20
+
+#logging
+logging:
+  level:
+    root: INFO
+    org.springframework.web: DEBUG
+    br.com.amedigital: DEBUG
+    reactor.netty.http.client: INFO
+  pattern:
+    console: '%highlight(<<%-5level>>) %d{HH:mm:ss:SSS} [%thread]%X{user} %magenta(%c{0}.%M) - %m%n'
+
+  # Actuator configs
+management:
+  endpoints.web.base-path: /
+  endpoint.flyway.enabled: true
+
+partner:
+  url: https://api.partner.com.br
+  auth:
+    username: partnerauth
+    password: partnerpassword

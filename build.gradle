@@ -1,0 +1,81 @@
+plugins {
+    id 'io.spring.dependency-management' version '1.0.8.RELEASE'
+    id 'org.springframework.boot' version '2.2.5.RELEASE'
+    id 'java'
+}
+
+group = 'br.com.amedigital.vehicle.debts.api'
+
+// default java version
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
+
+// encoding
+compileJava.options.encoding = 'UTF-8'
+compileTestJava.options.encoding = 'UTF-8'
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'com.zaxxer:HikariCP:3.4.1'
+    implementation 'org.json:json:20190722'
+    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'com.newrelic.agent.java:newrelic-api:5.8.0'
+    implementation 'org.springframework.boot:spring-boot-devtools'
+    implementation 'io.projectreactor.addons:reactor-extra:3.3.1.RELEASE'
+    implementation 'org.springframework.cloud:spring-cloud-starter-config:2.1.1.RELEASE'
+
+    // DATABASE
+    implementation 'org.flywaydb:flyway-core:6.3.0'
+    implementation 'org.jdbi:jdbi3-core:3.11.1'
+    runtimeOnly 'mysql:mysql-connector-java'
+
+    // APACHE
+    implementation 'org.apache.commons:commons-text:1.8'
+    implementation 'org.apache.httpcomponents:httpcore:4.4.12'
+    implementation 'org.apache.commons:commons-lang3:3.9'
+    implementation 'commons-io:commons-io:2.6'
+    implementation 'commons-codec:commons-codec:1.13'
+
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+    testImplementation 'io.projectreactor:reactor-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+
+    // THYMELEAF
+    implementation 'org.thymeleaf:thymeleaf:3.0.11.RELEASE'
+    implementation 'org.thymeleaf.extras:thymeleaf-extras-java8time:3.0.4.RELEASE'
+
+    // MAIL
+    implementation 'javax.mail:javax.mail-api:1.6.2'
+    implementation 'com.sun.mail:javax.mail:1.6.2'
+
+    // TESTS
+    testImplementation 'org.mockito:mockito-core:2.+'
+    testImplementation 'com.squareup.okhttp:mockwebserver:2.7.5'
+    testRuntimeOnly 'com.h2database:h2:1.4.199'
+
+    implementation 'org.springframework.guice:spring-guice:1.1.4.RELEASE'
+}
+
+// setting the wrapper version
+wrapper {
+    gradleVersion = '6.2.2'
+    distributionType = Wrapper.DistributionType.ALL
+}
