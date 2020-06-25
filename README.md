@@ -53,13 +53,13 @@ INPE - Previsões de tempo - http://servicos.cptec.inpe.br/XML/
 
 ## Atividades
 
-#####Atividade 1
+##### Atividade 1
 
 Criar um novo endpoint para ver previsão dos próximos 7 dias. Salvar no banco como ocorre com o de 4 dias.
 
 Detalhes desse endpoint estão no link da api pública do INPE.
    
-#####Atividade 2
+##### Atividade 2
 
 Alterar os endpoints para permitir que seja passado o nome da cidade ao invés do código
 
@@ -68,7 +68,7 @@ Detalhes desse endpoint estão no link da api pública do INPE.
 Validar o nome da cidade passado. Usar melhores práticas. Colocar como query string? Ou mudar o método para POST? 
 Que validações colocar? Onde? Que erro retornar?
 
-#####Atividade 3
+##### Atividade 3
 
 Existe um endpoint do INPE para ver condições de previsão de ondas para as cidades litorâneas (dia atual, manhã, tarde e noite)
 
@@ -76,7 +76,7 @@ Criar um endpoint para ver essas previsões de ondas. Detalhes desse endpoint es
 
 Esse endpoint deve seguir o modelo dos outros endpoints, inclusive salvando no banco.
 
-#####Atividade 4
+##### Atividade 4
 
 Criar um CRUD para permitir que nós mesmo cadastremos ou atualizamos informações metereológicas no banco.
 - findAllWeather
@@ -85,7 +85,7 @@ Criar um CRUD para permitir que nós mesmo cadastremos ou atualizamos informaç�
 - putWeather
 - deleteWeather
 
-#####Atividade 5
+##### Atividade 5
 
 Hoje o endpoint weather/{codCidade} funciona com o seguinte fluxo:
 
@@ -108,16 +108,16 @@ se existe previsão para aquela data em específico, o sistema  nem chamasse o p
    3. O sistema transforma todas as datas para os próximos 4 dias em uma Resposta
    3. O sistema devolve a resposta com a previsão para os próximos 4 dias a partir da data atual
       
-#####Atividade 6
+##### Atividade 6
 
 Preencher o openapi.yaml desse projeto. Ele fica localizado na pasta /docs do projeto
 
-#####Atividade 7
+##### Atividade 7
 
 No endpoint findAllWeather, criar um filtro pra fazer a busca por data, temperatura minima, temperatura máxima ou qualquer
 combinação dessas. No endpoint de deleteWeather usar soft Delete.
 
-#####Atividade 8
+##### Atividade 8
 
 Criar os campos createdAt e updatedAt na entidade de Weather. O primeiro campo deve ser atualizado sempre que um registro
 nessa tabela é inserido. O segundo campo deve ser atualizado sempre que um registro na tabela é atualizado.
@@ -135,7 +135,7 @@ StepVerifier.create(famousService.save(mockedEntity()))
         .verify(); 
 ```
 
-####Observações
+#### Observações
 Criar mensagens de erro adequadas
 
 Criar exceções quando necessário
