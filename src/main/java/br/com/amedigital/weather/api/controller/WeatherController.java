@@ -5,8 +5,8 @@ import br.com.amedigital.weather.api.service.WeatherService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 
@@ -22,15 +22,15 @@ public class WeatherController {
         this.weatherService = weatherService;
     }
 
-    @GetMapping("/{cityCode}")
-    public Flux<WeatherResponse> findWeatherToCity(@PathVariable String cityCode) {
-        return weatherService.findWeatherToCity(Integer.parseInt(cityCode))
+    @GetMapping
+    public Flux<WeatherResponse> findWeatherToCity(@RequestParam("cityName") String cityName) {
+        return weatherService.findWeatherToCity(cityName)
                 .doOnTerminate(() -> LOG.info("=== Finish finding weather to city ==="));
     }
 
-    @GetMapping("/{cityCode}/week")
-    public Flux<WeatherResponse> findWeatherToCityToNextWeek(@PathVariable String cityCode) {
-        return weatherService.findWeatherToCityToNextWeek(Integer.parseInt(cityCode))
+    @GetMapping("/week")
+    public Flux<WeatherResponse> findWeatherToCityToNextWeek(@RequestParam("cityName") String cityName) {
+        return weatherService.findWeatherToCityToNextWeek(cityName)
                 .doOnTerminate(() -> LOG.info("=== Finish finding weather to city ==="));
     }
 }

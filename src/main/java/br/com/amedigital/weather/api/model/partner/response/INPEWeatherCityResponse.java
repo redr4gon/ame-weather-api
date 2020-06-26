@@ -6,6 +6,7 @@ import java.util.List;
 @XmlRootElement(name = "cidade")
 public class INPEWeatherCityResponse {
 
+    private Integer code;
     private String name;
     private String state;
     private String updatedAt;
@@ -53,6 +54,14 @@ public class INPEWeatherCityResponse {
         public void setWeather(String weather) {
             this.weather = weather;
         }
+    }
+
+    public Integer getCode() {
+        return code;
+    }
+
+    public void setCode(Integer code) {
+        this.code = code;
     }
 
     @XmlElement(name = "nome")

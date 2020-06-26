@@ -27,14 +27,14 @@ public class WeatherMapper {
         return weather;
     }
 
-    public List<WeatherEntity> INPEWeatherCityResponseToEntity(INPEWeatherCityResponse inpeWeatherCityResponse, Integer code) {
+    public List<WeatherEntity> INPEWeatherCityResponseToEntity(INPEWeatherCityResponse inpeWeatherCityResponse) {
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
         return inpeWeatherCityResponse.getWeather().stream()
                 .flatMap(w ->  {
                     WeatherEntity entity = new WeatherEntity();
-                    entity.setCityCode(code);
+                    entity.setCityCode(inpeWeatherCityResponse.getCode());
                     entity.setCityName(inpeWeatherCityResponse.getName());
                     entity.setMaximumTemperature(w.getMaxTemperature());
                     entity.setMinimumTemperature(w.getMinTemperature());
