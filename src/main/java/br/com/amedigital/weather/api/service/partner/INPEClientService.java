@@ -32,12 +32,28 @@ public class INPEClientService extends BaseWebClient {
         LOG.debug("==== Find weather to city ====");
 
         return handleGenericMono(HttpMethod.GET, urlWeather(cityCode), INPEWeatherCityResponse.class, MediaType.APPLICATION_XML_VALUE)
-                        .doOnError(throwable -> LOG.error("=== Error finding weather to city ===", throwable));
+                .doOnError(throwable -> LOG.error("=== Error finding weather to city ===", throwable));
+    }
+
+    @Trace(dispatcher = true)
+    public Mono<INPEWeatherCityResponse> findWeatherToCityToNextWeek(Integer cityCode) {
+        LOG.debug("==== Find weather to city to next week ====");
+
+        return handleGenericMono(HttpMethod.GET, urlWeatherNextWeek(cityCode), INPEWeatherCityResponse.class, MediaType.APPLICATION_XML_VALUE)
+                .doOnError(throwable -> LOG.error("=== Error finding weather to city to next weeb ===", throwable));
     }
 
     protected UriComponents urlWeather(Integer cityCode) {
+        return uriBuilder(CITY_WEATHER.replaceAll("#", String.valueOf(cityCode)));
+    }
+
+    protected UriComponents urlWeatherNextWeek(Integer cityCode) {
+        return uriBuilder(CITY_WEATHER.replaceAll("#", "7dias/" + cityCode));
+    }
+
+    protected UriComponents uriBuilder(String pathSegment) {
         return urlBuilder()
-                .pathSegment(CITY_WEATHER.replaceAll("#", String.valueOf(cityCode)))
+                .pathSegment(pathSegment)
                 .build();
     }
 

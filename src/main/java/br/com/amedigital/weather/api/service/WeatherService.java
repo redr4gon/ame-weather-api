@@ -41,4 +41,15 @@ public class WeatherService {
                 .onErrorMap(throwable -> throwable)
                 .flatMap(entity -> Flux.just(mapper.entitytoResponse(entity)));
     }
+
+    public Flux<WeatherResponse> findWeatherToCityToNextWeek(Integer cityCode) {
+        return inpeClientService.findWeatherToCityToNextWeek(cityCode)
+                .switchIfEmpty(Mono.error(new NotFoundException(ErrorMessages.GENERIC_NOT_FOUND_EXCEPTION)))
+                .flatMap(inpeWeatherCityResponse -> inpeWeatherCityResponse.getName() == null || inpeWeatherCityResponse.getName().equals("null") ?
+                        Mono.error(new NotFoundException(ErrorMessages.GENERIC_NOT_FOUND_EXCEPTION)) : Mono.just(inpeWeatherCityResponse))
+                .flatMapMany(response ->  weatherRepository.save(mapper.INPEWeatherCityResponseToEntity(response, cityCode)))
+                .doOnError(throwable -> LOG.error("=== Error finding weather to city with code: {} ===", cityCode))
+                .onErrorMap(throwable -> throwable)
+                .flatMap(entity -> Flux.just(mapper.entitytoResponse(entity)));
+    }
 }
