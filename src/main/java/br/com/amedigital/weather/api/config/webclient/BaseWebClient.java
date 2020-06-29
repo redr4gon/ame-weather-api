@@ -10,6 +10,7 @@ import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import javax.validation.constraints.NotNull;
@@ -46,6 +47,11 @@ public abstract class BaseWebClient {
         return retrieveMono(requestBuilder(uri.toUri(), method, mediaType), clazz);
     }
 
+    protected <C> Flux<C> handleGenericFlux(HttpMethod method, UriComponents uri, Class<C> clazz, String mediaType) {
+        requiredFields(uri, clazz);
+        return retrieveFlux(requestBuilder(uri.toUri(), method, mediaType), clazz);
+    }
+
     protected UriComponentsBuilder urlBuilder() {
         try {
             URI uri = new URI(url);
@@ -61,6 +67,14 @@ public abstract class BaseWebClient {
                 .retrieve()
                 .onStatus(HttpStatus::isError, this::getErrorResponse)
                 .bodyToMono(clazz)
+                .onErrorResume(Mono::error);
+    }
+
+    private <C> Flux<C> retrieveFlux(WebClient.RequestBodySpec request, Class<C> clazz) {
+        return request
+                .retrieve()
+                .onStatus(HttpStatus::isError, this::getErrorResponse)
+                .bodyToFlux(clazz)
                 .onErrorResume(Mono::error);
     }
 
