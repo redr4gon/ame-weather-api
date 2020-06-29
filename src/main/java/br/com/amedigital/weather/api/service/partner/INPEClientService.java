@@ -1,8 +1,12 @@
 package br.com.amedigital.weather.api.service.partner;
 
 import br.com.amedigital.weather.api.config.webclient.BaseWebClient;
+import br.com.amedigital.weather.api.exception.BadRequestException;
+import br.com.amedigital.weather.api.model.ErrorMessages;
 import br.com.amedigital.weather.api.model.partner.response.INPECityResponse;
+import br.com.amedigital.weather.api.model.partner.response.INPEWaveCityResponse;
 import br.com.amedigital.weather.api.model.partner.response.INPEWeatherCityResponse;
+import br.com.amedigital.weather.api.utils.StringUtils;
 import com.newrelic.api.agent.Trace;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,8 +16,10 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponents;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -22,8 +28,9 @@ public class INPEClientService extends BaseWebClient {
 
     private static final Logger LOG = getLogger(INPEClientService.class);
 
-    public static final String CITY_WEATHER = "cidade/#/previsao.xml";
+    public static final String CITY_WEATHER = "cidade/{cityCode}/previsao.xml";
     public static final String CITY_LIST = "listaCidades";
+    public static final String CITY_WAVE = "cidade/{cityCode}/dia/{date}/ondas.xml";
 
     @Autowired
     public INPEClientService(final WebClient webClient, @Value("${partner.url}") final String url) {
@@ -51,10 +58,33 @@ public class INPEClientService extends BaseWebClient {
     }
 
     @Trace(dispatcher = true)
-    public Flux<INPECityResponse> findCityByName(String cityName) {
+    public Mono<INPECityResponse.City> findCityByName(String cityName) {
         LOG.debug("==== Find city by name ====");
 
         return handleGenericFlux(HttpMethod.GET, urlCity(cityName), INPECityResponse.class, MediaType.APPLICATION_XML_VALUE)
+                .flatMap(cityResponse -> {
+                    List<INPECityResponse.City> cities = cityResponse.getCities()
+                            .stream()
+                            .filter(city -> city.getName().equalsIgnoreCase(cityName))
+                            .collect(Collectors.toList());
+
+                    if (cities.size() != 1 || StringUtils.isEmpty(cities.get(0).getName())) {
+                        return Mono.error(new BadRequestException(ErrorMessages.GENERIC_NOT_FOUND_EXCEPTION));
+                    }
+
+                    return Mono.just(cities.get(0));
+                })
+                .single()
+                .doOnError(throwable -> LOG.error("=== Error finding city by name ===", throwable));
+    }
+
+    @Trace(dispatcher = true)
+    public Mono<INPEWaveCityResponse> findWaveByCity(Integer cityCode) {
+        return handleGenericMono(HttpMethod.GET, urlWave(cityCode, 0), INPEWaveCityResponse.class, MediaType.APPLICATION_XML_VALUE)
+                .map(inpeWaveCityResponse -> {
+                    inpeWaveCityResponse.setCode(cityCode);
+                    return inpeWaveCityResponse;
+                })
                 .doOnError(throwable -> LOG.error("=== Error finding city by name ===", throwable));
     }
 
@@ -66,11 +96,18 @@ public class INPEClientService extends BaseWebClient {
     }
 
     protected UriComponents urlWeather(Integer cityCode) {
-        return uriBuilder(CITY_WEATHER.replaceAll("#", String.valueOf(cityCode)));
+        return uriBuilder(CITY_WEATHER.replace("{cityCode}", String.valueOf(cityCode)));
+    }
+
+    protected UriComponents urlWave(Integer cityCode, Integer date) {
+        return uriBuilder(CITY_WAVE
+                .replace("{cityCode}", String.valueOf(cityCode))
+                .replace("{date}", String.valueOf(date))
+        );
     }
 
     protected UriComponents urlWeatherNextWeek(Integer cityCode) {
-        return uriBuilder(CITY_WEATHER.replaceAll("#", "7dias/" + cityCode));
+        return uriBuilder(CITY_WEATHER.replace("{cityCode}", "7dias/" + cityCode));
     }
 
     protected UriComponents uriBuilder(String pathSegment) {
