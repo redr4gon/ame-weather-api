@@ -1,5 +1,6 @@
 package br.com.amedigital.weather.api.config.database;
 
+import br.com.amedigital.weather.api.mapper.WeatherMapper;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.jdbi.v3.core.Handles;
@@ -53,6 +54,7 @@ public class DatabaseConfig {
         Jdbi jdbi = Jdbi.create(dataSource);
         jdbi.setSqlLogger(new DefaultSqlLogger());
         jdbi.getConfig(Handles.class).setForceEndTransactions(false);
+        jdbi.registerRowMapper(new WeatherMapper());
 
         return jdbi;
     }

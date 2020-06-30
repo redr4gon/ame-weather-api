@@ -2,11 +2,14 @@ package br.com.amedigital.weather.api.repository;
 
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.locator.ClasspathSqlLocator;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 
 import java.util.concurrent.Callable;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 public abstract class BaseRepository {
 
@@ -26,5 +29,10 @@ public abstract class BaseRepository {
                 .publishOn(Schedulers.parallel());
     }
 
+    public <T> Flux<T> asyncFlux(Supplier<Stream<? extends T>> streamSupplier) {
+        return Flux.fromStream(streamSupplier)
+                .subscribeOn(jdbcScheduler)
+                .publishOn(Schedulers.parallel());
+    }
 
 }

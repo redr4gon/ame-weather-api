@@ -1,8 +1,8 @@
 package br.com.amedigital.weather.api.service.partner;
 
 import br.com.amedigital.weather.api.config.webclient.BaseWebClient;
-import br.com.amedigital.weather.api.exception.BadRequestException;
-import br.com.amedigital.weather.api.model.ErrorMessages;
+import br.com.amedigital.weather.api.exception.NotFoundException;
+import br.com.amedigital.weather.api.exception.messages.CityErrorMessages;
 import br.com.amedigital.weather.api.model.partner.response.INPECityResponse;
 import br.com.amedigital.weather.api.model.partner.response.INPEWaveCityResponse;
 import br.com.amedigital.weather.api.model.partner.response.INPEWeatherCityResponse;
@@ -42,6 +42,10 @@ public class INPEClientService extends BaseWebClient {
         LOG.debug("==== Find weather to city ====");
 
         return handleGenericMono(HttpMethod.GET, urlWeather(cityCode), INPEWeatherCityResponse.class, MediaType.APPLICATION_XML_VALUE)
+                .map(item -> {
+                    item.setCode(cityCode);
+                    return item;
+                })
                 .doOnError(throwable -> LOG.error("=== Error finding weather to city ===", throwable));
     }
 
@@ -69,7 +73,7 @@ public class INPEClientService extends BaseWebClient {
                             .collect(Collectors.toList());
 
                     if (cities.size() != 1 || StringUtils.isEmpty(cities.get(0).getName())) {
-                        return Mono.error(new BadRequestException(ErrorMessages.GENERIC_NOT_FOUND_EXCEPTION));
+                        return Mono.error(new NotFoundException(CityErrorMessages.CITY_NOT_FOUND));
                     }
 
                     return Mono.just(cities.get(0));
