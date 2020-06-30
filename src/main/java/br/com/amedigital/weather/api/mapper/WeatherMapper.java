@@ -17,11 +17,12 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Component
-public class WeatherMapper implements RowMapper<WeatherResponse> {
+public class WeatherMapper {
 
     public WeatherResponse entityToResponse(WeatherEntity weatherEntity) {
         return WeatherResponse.Builder
                 .aWeatherResponse()
+                .id(weatherEntity.getId())
                 .weather(weatherEntity.getWeather())
                 .maximumTemperature(weatherEntity.getMaximumTemperature())
                 .minimumTemperature(weatherEntity.getMinimumTemperature())
@@ -32,7 +33,8 @@ public class WeatherMapper implements RowMapper<WeatherResponse> {
     }
 
     public WeatherEntity responseToEntity(WeatherResponse weatherResponse) {
-        return new WeatherEntity.Builder()
+        return WeatherEntity.Builder
+                .aWeatherEntity()
                 .cityCode(weatherResponse.getWeatherCityCode())
                 .cityName(weatherResponse.getWeatherCity())
                 .maximumTemperature(weatherResponse.getMaximumTemperature())
@@ -48,7 +50,9 @@ public class WeatherMapper implements RowMapper<WeatherResponse> {
 
         return inpeWeatherCityResponse.getWeather().stream()
                 .flatMap(w -> {
-                    WeatherEntity entity = new WeatherEntity.Builder()
+                    WeatherEntity entity = WeatherEntity.Builder
+                            .aWeatherEntity()
+                            .id(w.getId())
                             .cityCode(inpeWeatherCityResponse.getCode())
                             .cityName(inpeWeatherCityResponse.getName())
                             .maximumTemperature(w.getMaxTemperature())
@@ -61,17 +65,37 @@ public class WeatherMapper implements RowMapper<WeatherResponse> {
                 }).collect(Collectors.toList());
     }
 
-    @Override
-    public WeatherResponse map(ResultSet rs, StatementContext ctx) throws SQLException {
-        return WeatherResponse.Builder
-                .aWeatherResponse()
-                .weather(WeatherType.valueOf(rs.getString("weather")))
-                .maximumTemperature(rs.getInt("maximumTemperature"))
-                .minimumTemperature(rs.getInt("minimumTemperature"))
-                .weatherCity(rs.getString("cityName"))
-                .weatherCityCode(rs.getInt("cityCode"))
-                .weatherDate(rs.getDate("date").toLocalDate())
-                .build();
+    public static final class WeatherResponseMapper implements RowMapper<WeatherResponse> {
+
+        @Override
+        public WeatherResponse map(ResultSet rs, StatementContext ctx) throws SQLException {
+            return WeatherResponse.Builder
+                    .aWeatherResponse()
+                    .weather(WeatherType.valueOf(rs.getString("weather")))
+                    .maximumTemperature(rs.getInt("maximumTemperature"))
+                    .minimumTemperature(rs.getInt("minimumTemperature"))
+                    .weatherCity(rs.getString("cityName"))
+                    .weatherCityCode(rs.getInt("cityCode"))
+                    .weatherDate(rs.getDate("date").toLocalDate())
+                    .build();
+        }
+    }
+
+    public static final class WeatherEntityMapper implements RowMapper<WeatherEntity> {
+
+        @Override
+        public WeatherEntity map(ResultSet rs, StatementContext ctx) throws SQLException {
+            return WeatherEntity.Builder
+                    .aWeatherEntity()
+                    .id(rs.getString("id"))
+                    .weather(WeatherType.valueOf(rs.getString("weather")))
+                    .maximumTemperature(rs.getInt("maximumTemperature"))
+                    .minimumTemperature(rs.getInt("minimumTemperature"))
+                    .cityName(rs.getString("cityName"))
+                    .cityCode(rs.getInt("cityCode"))
+                    .date(rs.getDate("date").toLocalDate())
+                    .build();
+        }
     }
 
 }

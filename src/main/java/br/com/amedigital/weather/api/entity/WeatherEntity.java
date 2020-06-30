@@ -14,14 +14,7 @@ public class WeatherEntity {
     private String cityName;
     private LocalDate date;
 
-    public WeatherEntity(Builder builder) {
-        this.id = builder.id;
-        this.maximumTemperature = builder.maximumTemperature;
-        this.minimumTemperature = builder.minimumTemperature;
-        this.weather = builder.weather;
-        this.cityCode = builder.cityCode;
-        this.cityName = builder.cityName;
-        this.date = builder.date;
+    private WeatherEntity() {
     }
 
     public String getId() {
@@ -81,47 +74,53 @@ public class WeatherEntity {
     }
 
     public static final class Builder {
+        private WeatherEntity weatherEntity;
 
-        public String id;
-        public Integer maximumTemperature;
-        public Integer minimumTemperature;
-        public WeatherType weather;
-        public Integer cityCode;
-        public String cityName;
-        public LocalDate date;
+        private Builder() {
+            weatherEntity = new WeatherEntity();
+        }
 
-        public Builder maximumTemperature(Integer val) {
-            this.maximumTemperature = val;
+        public static Builder aWeatherEntity() {
+            return new Builder();
+        }
+
+        public Builder id(String id) {
+            weatherEntity.setId(id);
             return this;
         }
 
-        public Builder minimumTemperature(Integer val) {
-            this.minimumTemperature = val;
+        public Builder maximumTemperature(Integer maximumTemperature) {
+            weatherEntity.setMaximumTemperature(maximumTemperature);
             return this;
         }
 
-        public Builder weather(WeatherType val) {
-            this.weather = val;
+        public Builder minimumTemperature(Integer minimumTemperature) {
+            weatherEntity.setMinimumTemperature(minimumTemperature);
             return this;
         }
 
-        public Builder cityCode(Integer val) {
-            this.cityCode = val;
+        public Builder weather(WeatherType weather) {
+            weatherEntity.setWeather(weather);
             return this;
         }
 
-        public Builder cityName(String val) {
-            this.cityName = val;
+        public Builder cityCode(Integer cityCode) {
+            weatherEntity.setCityCode(cityCode);
             return this;
         }
 
-        public Builder date(LocalDate val) {
-            this.date = val;
+        public Builder cityName(String cityName) {
+            weatherEntity.setCityName(cityName);
+            return this;
+        }
+
+        public Builder date(LocalDate date) {
+            weatherEntity.setDate(date);
             return this;
         }
 
         public WeatherEntity build() {
-            return new WeatherEntity(this);
+            return weatherEntity;
         }
     }
 

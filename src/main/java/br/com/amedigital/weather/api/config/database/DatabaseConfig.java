@@ -54,7 +54,9 @@ public class DatabaseConfig {
         Jdbi jdbi = Jdbi.create(dataSource);
         jdbi.setSqlLogger(new DefaultSqlLogger());
         jdbi.getConfig(Handles.class).setForceEndTransactions(false);
-        jdbi.registerRowMapper(new WeatherMapper());
+        jdbi
+                .registerRowMapper(new WeatherMapper.WeatherResponseMapper())
+                .registerRowMapper(new WeatherMapper.WeatherEntityMapper());
 
         return jdbi;
     }

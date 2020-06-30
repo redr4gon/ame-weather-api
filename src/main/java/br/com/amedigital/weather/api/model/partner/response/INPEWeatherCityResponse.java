@@ -14,10 +14,19 @@ public class INPEWeatherCityResponse {
 
     public static class Weather {
 
+        private String id;
         private String localDate;
         private Integer maxTemperature;
         private Integer minTemperature;
         private String weather;
+
+        public String getId() {
+            return id;
+        }
+
+        public void setId(String id) {
+            this.id = id;
+        }
 
         @XmlElement(name = "dia")
         public String getLocalDate() {

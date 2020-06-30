@@ -8,9 +8,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.UUID;
 
 @Repository
@@ -29,25 +26,16 @@ public class WeatherRepository extends BaseRepository {
         ));
     }
 
-    public Mono<WeatherEntity> save(WeatherEntity weatherEntity) {
-        return save(Collections.singletonList(weatherEntity)).single();
-    }
-
-    public Flux<WeatherEntity> save(List<WeatherEntity> entities) {
-        List<WeatherEntity> weatherEntities = new ArrayList<>();
-
+    public Mono<WeatherEntity> save(WeatherEntity entity) {
         return async(() -> jdbi.inTransaction(handle -> {
 
-            entities.stream().forEach(entity -> {
-                entity.setId(UUID.randomUUID().toString());
-                handle.createUpdate(sqlLocator.locate("sql.weather.save-weather"))
-                        .bindBean(entity)
-                        .execute();
-                weatherEntities.add(entity);
-            });
+            entity.setId(UUID.randomUUID().toString());
+            handle.createUpdate(sqlLocator.locate("sql.weather.save-weather"))
+                    .bindBean(entity)
+                    .execute();
 
-            return weatherEntities;
-        })).flatMapIterable(e -> e);
+            return entity;
+        }));
     }
 
     public Mono<WeatherResponse> findById(String weatherId) {
@@ -83,4 +71,14 @@ public class WeatherRepository extends BaseRepository {
         }));
     }
 
+    public Flux<WeatherEntity> findByCityCode(Integer cityCode, Integer plusDays) {
+        return asyncFlux(() -> jdbi.withHandle(handle -> handle
+                .createQuery(sqlLocator.locate("sql.weather.find-weather-by-city-code"))
+                .bind("cityCode", cityCode)
+                .bind("plusDays", plusDays)
+                .mapTo(WeatherEntity.class)
+                .list()
+                .stream()
+        ));
+    }
 }

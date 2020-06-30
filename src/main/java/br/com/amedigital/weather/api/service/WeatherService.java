@@ -8,14 +8,21 @@ import br.com.amedigital.weather.api.exception.NotFoundException;
 import br.com.amedigital.weather.api.exception.messages.WeatherErrorMessages;
 import br.com.amedigital.weather.api.mapper.WeatherMapper;
 import br.com.amedigital.weather.api.model.ErrorMessages;
+import br.com.amedigital.weather.api.model.partner.response.INPEWeatherCityResponse;
 import br.com.amedigital.weather.api.repository.WeatherRepository;
 import br.com.amedigital.weather.api.service.partner.INPEClientService;
 import br.com.amedigital.weather.api.utils.StringUtils;
+import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 
 @Service
 public class WeatherService {
@@ -37,25 +44,62 @@ public class WeatherService {
             return weatherRepository.findAllWeather();
         }
 
+        AtomicInteger cityCode = new AtomicInteger();
+
         return inpeClientService
                 .findCityByName(cityName)
-                .flatMap(inpeWeatherCityResponse -> inpeClientService.findWeatherToCity(inpeWeatherCityResponse.getCode()))
+                .flatMapMany(inpeWeatherCityResponse -> {
+                    cityCode.set(inpeWeatherCityResponse.getCode());
+                    return weatherRepository.findByCityCode(inpeWeatherCityResponse.getCode(), 3);
+                })
+                .collectList()
+                .flatMapMany(weatherEntities -> filterDaysByCity(weatherEntities, 4, (a) -> inpeClientService.findWeatherToCity(cityCode.get())))
                 .switchIfEmpty(Mono.error(new NotFoundException(ErrorMessages.GENERIC_NOT_FOUND_EXCEPTION)))
-                .flatMapMany(response -> weatherRepository.save(mapper.INPEWeatherCityResponseToEntity(response)))
+                .flatMap(weatherEntity -> StringUtils.isEmpty(weatherEntity.getId()) ? weatherRepository.save(weatherEntity) : Mono.just(weatherEntity))
                 .doOnError(throwable -> LOG.error("=== Error finding weather to city with name: {} ===", cityName))
                 .onErrorMap(throwable -> throwable)
-                .flatMap(entity -> Flux.just(mapper.entityToResponse(entity)));
+                .map(mapper::entityToResponse);
     }
 
     public Flux<WeatherResponse> findWeatherToCityToNextWeek(String cityName) {
+        AtomicInteger cityCode = new AtomicInteger();
+
         return inpeClientService
                 .findCityByName(cityName)
-                .flatMap(inpeWeatherCityResponse -> inpeClientService.findWeatherToCityToNextWeek(inpeWeatherCityResponse.getCode()))
-                .switchIfEmpty(Mono.error(new NotFoundException(ErrorMessages.GENERIC_NOT_FOUND_EXCEPTION)))
-                .flatMapMany(response -> weatherRepository.save(mapper.INPEWeatherCityResponseToEntity(response)))
+                .flatMapMany(inpeWeatherCityResponse -> {
+                    cityCode.set(inpeWeatherCityResponse.getCode());
+                    return weatherRepository.findByCityCode(inpeWeatherCityResponse.getCode(), 6);
+                })
+                .collectList()
+                .flatMapMany(weatherEntities -> filterDaysByCity(weatherEntities, 7, (a) -> inpeClientService.findWeatherToCityToNextWeek(cityCode.get())))
+                .flatMap(weatherEntity -> StringUtils.isEmpty(weatherEntity.getId()) ? weatherRepository.save(weatherEntity) : Mono.just(weatherEntity))
                 .doOnError(throwable -> LOG.error("=== Error finding weather to city with name: {} ===", cityName))
                 .onErrorMap(throwable -> throwable)
-                .flatMap(entity -> Flux.just(mapper.entityToResponse(entity)));
+                .map(mapper::entityToResponse);
+    }
+
+
+    private Publisher<? extends WeatherEntity> filterDaysByCity(List<WeatherEntity> weatherEntities, int days, Function<Void, Mono<INPEWeatherCityResponse>> function) {
+        if (weatherEntities.size() == days) {
+            return Flux.fromIterable(weatherEntities);
+        }
+
+        return function.apply(null)
+                .single()
+                .map(mapper::INPEWeatherCityResponseToEntity)
+                .flatMapMany(entityList -> Flux.fromStream(entityList.stream()))
+                .mergeWith(Flux.fromIterable(weatherEntities))
+                .filter(weatherEntity -> {
+                    if (StringUtils.isNotEmpty(weatherEntity.getId())) {
+                        return true;
+                    }
+
+                    if (weatherEntity.getDate().isAfter(LocalDate.now().plusDays(days - 1))) {
+                        return false;
+                    }
+
+                    return weatherEntities.stream().noneMatch(w -> w.getDate().isEqual(weatherEntity.getDate()));
+                });
     }
 
     public Mono<WeatherResponse> findOneWeather(String weatherId) {
@@ -67,7 +111,8 @@ public class WeatherService {
         return inpeClientService
                 .findCityByName(weather.getWeatherCity())
                 .flatMap(inpeWeatherCityResponse -> {
-                    WeatherEntity weatherEntity = new WeatherEntity.Builder()
+                    WeatherEntity weatherEntity = WeatherEntity.Builder
+                            .aWeatherEntity()
                             .cityCode(inpeWeatherCityResponse.getCode())
                             .cityName(weather.getWeatherCity())
                             .date(weather.getWeatherDate())

@@ -6,6 +6,7 @@ import java.time.LocalDate;
 
 public class WeatherResponse {
 
+    private String id;
     private Integer weatherCityCode;
     private String weatherCity;
     private LocalDate weatherDate;
@@ -14,6 +15,14 @@ public class WeatherResponse {
     private WeatherType weather;
 
     private WeatherResponse() {
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public Integer getWeatherCityCode() {
@@ -75,6 +84,11 @@ public class WeatherResponse {
             return new Builder();
         }
 
+        public Builder id(String id) {
+            weatherResponse.setId(id);
+            return this;
+        }
+
         public Builder weatherCityCode(Integer weatherCityCode) {
             weatherResponse.setWeatherCityCode(weatherCityCode);
             return this;
@@ -108,17 +122,5 @@ public class WeatherResponse {
         public WeatherResponse build() {
             return weatherResponse;
         }
-    }
-
-    @Override
-    public String toString() {
-        return "WeatherResponse{" +
-                "weatherCityCode=" + weatherCityCode +
-                ", weatherCity='" + weatherCity + '\'' +
-                ", weatherDate=" + weatherDate +
-                ", maximumTemperature=" + maximumTemperature +
-                ", minimumTemperature=" + minimumTemperature +
-                ", weather=" + weather +
-                '}';
     }
 }
