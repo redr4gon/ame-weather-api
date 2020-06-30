@@ -1,6 +1,7 @@
 # Projeto Weather
 
-Projeto para integração com parceiro para pagamento de débitos de veículos na Zapay
+Projeto para integração com parceiro para visualização de tempo e temperatura
+Esse projeto visa o treinamento de onboarding de novos membros na empresa Exactaworks.
 
 ## Getting Started
 ### Pré-requisitos
