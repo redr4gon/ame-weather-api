@@ -1,5 +1,6 @@
 update weather set
 maximumTemperature = :maximumTemperature,
 minimumTemperature = :minimumTemperature,
-weather = :weather
+weather = :weather,
+updated_at = now()
 where id = :id;

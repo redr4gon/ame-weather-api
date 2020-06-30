@@ -2,6 +2,7 @@ plugins {
     id 'io.spring.dependency-management' version '1.0.8.RELEASE'
     id 'org.springframework.boot' version '2.2.5.RELEASE'
     id 'java'
+    id "org.flywaydb.flyway" version "6.5.0"
 }
 
 group = 'br.com.amedigital.vehicle.debts.api'
@@ -78,4 +79,11 @@ dependencies {
 wrapper {
     gradleVersion = '6.2.2'
     distributionType = Wrapper.DistributionType.ALL
+}
+
+flyway {
+    url = 'jdbc:mysql://localhost:3306/db_ame_weather?useUnicode=yes&characterEncoding=UTF-8&useTimezone=true&serverTimezone=America/Sao_Paulo'
+    user = 'root'
+    password = '123456'
+    schemas = ['db_ame_weather']
 }
