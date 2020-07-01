@@ -2,22 +2,375 @@ openapi: 3.0.0
 info:
   title: 'Ame Digital - Weather API'
   version: '1.0'
-  description: 'Projeto
+  description: 'Treinamento realizado por Eder Matos - ExactaWorks'
   contact:
     name: 'Ame Digital - Weather API'
-    email: amedigital@exactaworks.com
+    email: 'amedigital@exactaworks.com'
     url: 'http://www.amedigital.com/'
   license:
-    name: AME
+    name: 'AME'
 tags:
-  - name: weather
-    description: Refere-se a busca
+  - name: 'Weather'
+    description: 'Endpoint de climas'
+  - name: 'Wave'
+    description: 'Endpoint de ondas'
 paths:
-  /weather:
+  '/weather':
     get:
-      operationId: findWeather
-      summary: 'Busca'
+      operationId: 'findAllWeather'
+      summary: 'Busca os climas'
       tags:
-        - weather
+        - 'Weather'
+      parameters:
+        - name: cityName
+          in: query
+          description: Filtro por nome da cidade
+          required: false
+          schema:
+            type: string
+        - name: date
+          in: query
+          description: Data da previsão (DD/MM/YYYY)
+          required: false
+          schema:
+            type: string
+        - name: minimumTemperature
+          in: query
+          description: Temperatura minima para filtro
+          required: false
+          schema:
+            type: integer
+        - name: maximumTemperature
+          in: query
+          description: Temperatura máxima para filtro
+          required: false
+          schema:
+            type: integer
       responses:
-        '200'
+        '200':
+          description: Listagem de climas de acordo com o filtro
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/weatherResponse'
+        '400':
+          description: Erro de processamento
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/badRequestException'
+        '404':
+          description: Cidade não encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/notFoundException'
+    post:
+      operationId: 'createWeather'
+      summary: 'Insere um novo clima para uma determinada cidade'
+      tags:
+        - 'Weather'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/weatherNewRequest'
+      responses:
+        '201':
+          description: Sucesso na inserção do clima
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/weatherNewRequest'
+        '400':
+          description: Erro de processamento
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/badRequestException'
+        '404':
+          description: Cidade não encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/notFoundException'
+  '/weather/{id}':
+    get:
+      tags:
+        - Weather
+      summary: Busca um clima pelo id
+      operationId: findWeatherById
+      parameters:
+        - name: id
+          in: path
+          description: WeatherID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/weatherResponse'
+        '400':
+          description: Erro de processamento
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/badRequestException'
+        '404':
+          description: Clima não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/notFoundException'
+    put:
+      tags:
+        - Weather
+      summary: Atualiza um clima
+      operationId: updateWeather
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/weatherUpdateRequest'
+      parameters:
+        - name: id
+          in: path
+          description: WeatherID
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Clima atualizado com sucesso
+        '400':
+          description: Recurso não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/badRequestException'
+        '404':
+          description: Clima não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/notFoundException'
+    delete:
+      tags:
+        - Weather
+      summary: Deleta um clima
+      operationId: deleteWeather
+      parameters:
+        - name: id
+          in: path
+          description: WeatherID
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Clima deletado com sucesso
+        '400':
+          description: Erro de processamento
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/badRequestException'
+        '404':
+          description: Clima não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/notFoundException'
+  '/wave':
+    get:
+      tags:
+        - Wave
+      summary: Busca uma onda pelo nome da cidade
+      operationId: findWaveByCityName
+      parameters:
+        - name: cityName
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Sucesso ao buscar onda
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/waveResponse'
+        '400':
+          description: Erro de processamento
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/badRequestException'
+        '404':
+          description: Cidade não encontada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/notFoundException'
+components:
+  schemas:
+    weatherResponse:
+      type: object
+      properties:
+        weatherCityCode:
+          type: integer
+        weatherCity:
+          type: string
+        weatherDate:
+          type: string
+        maximumTemperature:
+          type: number
+        minimumTemperature:
+          type: number
+        weather:
+          type: string
+      example:
+        - weatherCityCode: "2242"
+          weatherCity: "Guariba"
+          weatherDate: "2020-06-30"
+          maximumTemperature: 13
+          minimumTemperature: 19
+          weather: "Parcialmente Nublado"
+    notFoundException:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "NotFoundException"
+        error_description:
+          type: string
+          example: "Recurso não encontrada"
+    badRequestException:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Bad Request Exception"
+        error_description:
+          type: string
+          example: "Ocorreu um erro desconhecido durante o processamento"
+    weatherNewRequest:
+      type: object
+      properties:
+        weatherCity:
+          type: string
+        weatherDate:
+          type: string
+        maximumTemperature:
+          type: integer
+        minimumTemperature:
+          type: integer
+        weather:
+          type: string
+      example:
+        weatherCity: "Guariba"
+        weatherDate: "2020-07-01"
+        maximumTemperature: 14
+        minimumTemperature: 25
+        weather: "Parcialmente Nublado"
+    weatherUpdateRequest:
+      type: object
+      properties:
+        maximumTemperature:
+          type: integer
+        minimumTemperature:
+          type: integer
+        weather:
+          type: string
+      example:
+        maximumTemperature: 14
+        minimumTemperature: 25
+        weather: "Parcialmente Nublado"
+    waveResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+        name:
+          type: string
+        state:
+          type: string
+        updatedAt:
+          type: number
+        morning:
+          type: object
+          properties:
+            date:
+              type: string
+            agitation:
+              type: string
+            height:
+              type: number
+            direction:
+              type: string
+            drift:
+              type: number
+            driftDirection:
+              type: string
+        afternoon:
+          type: object
+          properties:
+            date:
+              type: string
+            agitation:
+              type: string
+            height:
+              type: number
+            direction:
+              type: string
+            drift:
+              type: number
+            driftDirection:
+              type: string
+        night:
+          type: object
+          properties:
+            date:
+              type: string
+            agitation:
+              type: string
+            height:
+              type: number
+            direction:
+              type: string
+            drift:
+              type: number
+            driftDirection:
+              type: string
+      example:
+        code: '1546g1e65r1gege41ger51gr16e'
+        name: 'Rio de Janeiro'
+        state: 'RJ'
+        updateAt: '2020-06-30'
+        morning:
+          date: '2020-06-30'
+          agitation: Fraco
+          height: 1.4
+          direction: ESE
+          drift: 9.5
+          driftDirection: NE
+        afternoon:
+          date: '2020-06-30'
+          agitation: Fraco
+          height: 1.3
+          direction: ESE
+          drift: 8.6
+          driftDirection: NE
+        night:
+          date: '2020-06-30'
+          agitation: Fraco
+          height: 1.4
+          direction: SE
+          drift: 11.1
+          driftDirection: NE
