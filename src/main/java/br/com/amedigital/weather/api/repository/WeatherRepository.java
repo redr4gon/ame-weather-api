@@ -1,5 +1,6 @@
 package br.com.amedigital.weather.api.repository;
 
+import br.com.amedigital.weather.api.controller.request.WeatherRequest;
 import br.com.amedigital.weather.api.controller.response.WeatherResponse;
 import br.com.amedigital.weather.api.entity.WeatherEntity;
 import org.jdbi.v3.core.Jdbi;
@@ -17,12 +18,37 @@ public class WeatherRepository extends BaseRepository {
         super(jdbi, jdbcScheduler);
     }
 
-    public Flux<WeatherResponse> findAllWeather() {
-        return asyncFlux(() -> jdbi.withHandle(handle -> handle
-                .createQuery(sqlLocator.locate("sql.weather.find-all-weather"))
-                .mapTo(WeatherResponse.class)
-                .list()
-                .stream()
+    public Flux<WeatherResponse> findAllWeather(WeatherRequest weatherRequest) {
+        return asyncFlux(() -> jdbi.withHandle(handle -> {
+                    String query = sqlLocator.locate("sql.weather.find-all-weather");
+
+                    StringBuilder conditionals = new StringBuilder();
+
+                    if (weatherRequest.getDate() != null) {
+                        conditionals
+                                .append("and date = ")
+                                .append(weatherRequest.getDate());
+                    }
+
+                    if (weatherRequest.getMinimumTemperature() != null) {
+                        conditionals
+                                .append(" and minimumTemperature >= ")
+                                .append(weatherRequest.getMinimumTemperature());
+                    }
+
+                    if (weatherRequest.getMaximumTemperature() != null) {
+                        conditionals
+                                .append("and maximumTemperature <= ")
+                                .append(weatherRequest.getMaximumTemperature());
+                    }
+
+                    query = query.replace("and :conditionals", conditionals.toString());
+
+                    return handle.createQuery(query)
+                            .mapTo(WeatherResponse.class)
+                            .list()
+                            .stream();
+                }
         ));
     }
 

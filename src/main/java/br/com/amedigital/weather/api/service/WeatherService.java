@@ -1,6 +1,7 @@
 package br.com.amedigital.weather.api.service;
 
 import br.com.amedigital.weather.api.controller.request.WeatherNewRequest;
+import br.com.amedigital.weather.api.controller.request.WeatherRequest;
 import br.com.amedigital.weather.api.controller.request.WeatherUpdateRequest;
 import br.com.amedigital.weather.api.controller.response.WeatherResponse;
 import br.com.amedigital.weather.api.entity.WeatherEntity;
@@ -39,15 +40,15 @@ public class WeatherService {
         this.mapper = weatherMapper;
     }
 
-    public Flux<WeatherResponse> findWeatherToCity(String cityName) {
-        if (StringUtils.isEmpty(cityName)) {
-            return weatherRepository.findAllWeather();
+    public Flux<WeatherResponse> findWeatherToCity(WeatherRequest weatherRequest) {
+        if (StringUtils.isEmpty(weatherRequest.getCityName())) {
+            return weatherRepository.findAllWeather(weatherRequest);
         }
 
         AtomicInteger cityCode = new AtomicInteger();
 
         return inpeClientService
-                .findCityByName(cityName)
+                .findCityByName(weatherRequest.getCityName())
                 .flatMapMany(inpeWeatherCityResponse -> {
                     cityCode.set(inpeWeatherCityResponse.getCode());
                     return weatherRepository.findByCityCode(inpeWeatherCityResponse.getCode(), 3);
@@ -56,7 +57,7 @@ public class WeatherService {
                 .flatMapMany(weatherEntities -> filterDaysByCity(weatherEntities, 4, (a) -> inpeClientService.findWeatherToCity(cityCode.get())))
                 .switchIfEmpty(Mono.error(new NotFoundException(ErrorMessages.GENERIC_NOT_FOUND_EXCEPTION)))
                 .flatMap(weatherEntity -> StringUtils.isEmpty(weatherEntity.getId()) ? weatherRepository.save(weatherEntity) : Mono.just(weatherEntity))
-                .doOnError(throwable -> LOG.error("=== Error finding weather to city with name: {} ===", cityName))
+                .doOnError(throwable -> LOG.error("=== Error finding weather to city with name: {} ===", weatherRequest.getCityName()))
                 .onErrorMap(throwable -> throwable)
                 .map(mapper::entityToResponse);
     }

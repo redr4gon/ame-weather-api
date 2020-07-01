@@ -1,6 +1,7 @@
 package br.com.amedigital.weather.api.controller;
 
 import br.com.amedigital.weather.api.controller.request.WeatherNewRequest;
+import br.com.amedigital.weather.api.controller.request.WeatherRequest;
 import br.com.amedigital.weather.api.controller.request.WeatherUpdateRequest;
 import br.com.amedigital.weather.api.controller.response.WeatherResponse;
 import br.com.amedigital.weather.api.service.WeatherService;
@@ -26,8 +27,8 @@ public class WeatherController {
     }
 
     @GetMapping
-    public Flux<WeatherResponse> findWeatherToCity(@RequestParam(value = "cityName", required = false) String cityName) {
-        return weatherService.findWeatherToCity(cityName)
+    public Flux<WeatherResponse> findWeatherToCity(WeatherRequest weatherRequest) {
+        return weatherService.findWeatherToCity(weatherRequest)
                 .doOnTerminate(() -> LOG.info("=== Finish finding weather to city ==="));
     }
 

@@ -12,9 +12,9 @@ public final class StringUtils {
     public static boolean isEmpty(String text) {
         if (text == null) return true;
 
-        if (text.equalsIgnoreCase("null")) return true;
+        if (text.trim().isEmpty()) return true;
 
-        return text.trim().isEmpty();
+        return text.equalsIgnoreCase("null");
     }
 
 }
