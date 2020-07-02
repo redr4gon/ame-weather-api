@@ -5,6 +5,7 @@ import java.time.LocalDate;
 public class WeatherRequest {
 
     private String cityName;
+    private String state;
     private LocalDate date;
     private Integer minimumTemperature;
     private Integer maximumTemperature;
@@ -15,6 +16,14 @@ public class WeatherRequest {
 
     public void setCityName(String cityName) {
         this.cityName = cityName;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
     }
 
     public LocalDate getDate() {
@@ -45,10 +54,10 @@ public class WeatherRequest {
     public String toString() {
         return "WeatherRequest{" +
                 "cityName='" + cityName + '\'' +
+                ", state='" + state + '\'' +
                 ", date=" + date +
                 ", minimumTemperature=" + minimumTemperature +
                 ", maximumTemperature=" + maximumTemperature +
                 '}';
     }
-    
 }

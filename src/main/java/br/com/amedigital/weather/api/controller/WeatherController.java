@@ -60,8 +60,11 @@ public class WeatherController {
     }
 
     @GetMapping("/week")
-    public Flux<WeatherResponse> findWeatherToCityToNextWeek(@RequestParam("cityName") String cityName) {
-        return weatherService.findWeatherToCityToNextWeek(cityName)
+    public Flux<WeatherResponse> findWeatherToCityToNextWeek(
+            @RequestParam("cityName") String cityName,
+            @RequestParam(value = "state", required = false) String state
+    ) {
+        return weatherService.findWeatherToCityToNextWeek(cityName, state)
                 .doOnTerminate(() -> LOG.info("=== Finish finding weather to city ==="));
     }
 }

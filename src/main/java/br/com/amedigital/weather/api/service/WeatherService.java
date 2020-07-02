@@ -5,6 +5,7 @@ import br.com.amedigital.weather.api.controller.request.WeatherRequest;
 import br.com.amedigital.weather.api.controller.request.WeatherUpdateRequest;
 import br.com.amedigital.weather.api.controller.response.WeatherResponse;
 import br.com.amedigital.weather.api.entity.WeatherEntity;
+import br.com.amedigital.weather.api.exception.BadRequestException;
 import br.com.amedigital.weather.api.exception.NotFoundException;
 import br.com.amedigital.weather.api.exception.messages.WeatherErrorMessages;
 import br.com.amedigital.weather.api.mapper.WeatherMapper;
@@ -48,25 +49,25 @@ public class WeatherService {
         AtomicInteger cityCode = new AtomicInteger();
 
         return inpeClientService
-                .findCityByName(weatherRequest.getCityName())
+                .findCityByName(weatherRequest.getCityName(), weatherRequest.getState())
                 .flatMapMany(inpeWeatherCityResponse -> {
                     cityCode.set(inpeWeatherCityResponse.getCode());
                     return weatherRepository.findByCityCode(inpeWeatherCityResponse.getCode(), 3);
                 })
                 .collectList()
                 .flatMapMany(weatherEntities -> filterDaysByCity(weatherEntities, 4, (a) -> inpeClientService.findWeatherToCity(cityCode.get())))
-                .switchIfEmpty(Mono.error(new NotFoundException(ErrorMessages.GENERIC_NOT_FOUND_EXCEPTION)))
+                .switchIfEmpty(Mono.error(new BadRequestException(ErrorMessages.GENERIC_NOT_FOUND_EXCEPTION)))
                 .flatMap(weatherEntity -> StringUtils.isEmpty(weatherEntity.getId()) ? weatherRepository.save(weatherEntity) : Mono.just(weatherEntity))
                 .doOnError(throwable -> LOG.error("=== Error finding weather to city with name: {} ===", weatherRequest.getCityName()))
                 .onErrorMap(throwable -> throwable)
                 .map(mapper::entityToResponse);
     }
 
-    public Flux<WeatherResponse> findWeatherToCityToNextWeek(String cityName) {
+    public Flux<WeatherResponse> findWeatherToCityToNextWeek(String cityName, String state) {
         AtomicInteger cityCode = new AtomicInteger();
 
         return inpeClientService
-                .findCityByName(cityName)
+                .findCityByName(cityName, state)
                 .flatMapMany(inpeWeatherCityResponse -> {
                     cityCode.set(inpeWeatherCityResponse.getCode());
                     return weatherRepository.findByCityCode(inpeWeatherCityResponse.getCode(), 6);
@@ -110,7 +111,7 @@ public class WeatherService {
 
     public Mono<WeatherNewRequest> createWeather(WeatherNewRequest weather) {
         return inpeClientService
-                .findCityByName(weather.getWeatherCity())
+                .findCityByName(weather.getWeatherCity(), null)
                 .flatMap(inpeWeatherCityResponse -> {
                     WeatherEntity weatherEntity = WeatherEntity.Builder
                             .aWeatherEntity()

@@ -26,8 +26,9 @@ public class WeatherRepository extends BaseRepository {
 
                     if (weatherRequest.getDate() != null) {
                         conditionals
-                                .append("and date = ")
-                                .append(weatherRequest.getDate());
+                                .append("and date = \"")
+                                .append(weatherRequest.getDate())
+                                .append("\"");
                     }
 
                     if (weatherRequest.getMinimumTemperature() != null) {
@@ -38,11 +39,11 @@ public class WeatherRepository extends BaseRepository {
 
                     if (weatherRequest.getMaximumTemperature() != null) {
                         conditionals
-                                .append("and maximumTemperature <= ")
+                                .append(" and maximumTemperature <= ")
                                 .append(weatherRequest.getMaximumTemperature());
                     }
 
-                    query = query.replace("and :conditionals", conditionals.toString());
+                    query = query.replace(" and :conditionals", conditionals.toString());
 
                     return handle.createQuery(query)
                             .mapTo(WeatherResponse.class)

@@ -28,7 +28,7 @@ public class WaveService {
 
     public Mono<WaveResponse> findWaveByCityName(String cityName) {
         return inpeClientService
-                .findCityByName(cityName)
+                .findCityByName(cityName, null)
                 .switchIfEmpty(Mono.error(new NotFoundException(ErrorMessages.GENERIC_NOT_FOUND_EXCEPTION)))
                 .flatMap(city -> inpeClientService.findWaveByCity(city.getCode()))
                 .switchIfEmpty(Mono.error(new NotFoundException(ErrorMessages.GENERIC_NOT_FOUND_EXCEPTION)))

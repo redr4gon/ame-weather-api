@@ -62,17 +62,21 @@ public class INPEClientService extends BaseWebClient {
     }
 
     @Trace(dispatcher = true)
-    public Mono<INPECityResponse.City> findCityByName(String cityName) {
+    public Mono<INPECityResponse.City> findCityByName(String cityName, String state) {
         LOG.debug("==== Find city by name ====");
 
         return handleGenericFlux(HttpMethod.GET, urlCity(cityName), INPECityResponse.class, MediaType.APPLICATION_XML_VALUE)
                 .flatMap(cityResponse -> {
                     List<INPECityResponse.City> cities = cityResponse.getCities()
                             .stream()
-                            .filter(city -> city.getName().equalsIgnoreCase(cityName))
+                            .filter(city -> city.getName().equalsIgnoreCase(cityName) && (StringUtils.isEmpty(state) || city.getState().equalsIgnoreCase(state)))
                             .collect(Collectors.toList());
 
-                    if (cities.size() != 1 || StringUtils.isEmpty(cities.get(0).getName())) {
+                    if (cities.size() > 1) {
+                        return Mono.error(new NotFoundException(CityErrorMessages.MANY_CITIES_FOUND));
+                    }
+
+                    if (cities.size() == 0 || StringUtils.isEmpty(cities.get(0).getName())) {
                         return Mono.error(new NotFoundException(CityErrorMessages.CITY_NOT_FOUND));
                     }
 
@@ -95,7 +99,7 @@ public class INPEClientService extends BaseWebClient {
     protected UriComponents urlCity(String cityName) {
         return urlBuilder()
                 .pathSegment(CITY_LIST)
-                .queryParam("city", cityName)
+                .queryParam("city", StringUtils.removeAccents(cityName))
                 .build();
     }
 
