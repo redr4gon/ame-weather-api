@@ -1,5 +1,6 @@
 package br.com.amedigital.weather.api.mapper;
 
+import br.com.amedigital.weather.api.controller.request.WeatherRequest;
 import br.com.amedigital.weather.api.controller.response.WeatherResponse;
 import br.com.amedigital.weather.api.entity.WeatherEntity;
 import br.com.amedigital.weather.api.model.WeatherType;
@@ -32,7 +33,7 @@ public class WeatherMapper {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
         return inpeWeatherCityResponse.getWeather().stream()
-                .flatMap(w ->  {
+                .flatMap(w -> {
                     WeatherEntity entity = new WeatherEntity();
                     entity.setCityCode(code);
                     entity.setCityName(inpeWeatherCityResponse.getName());
@@ -42,6 +43,20 @@ public class WeatherMapper {
                     entity.setDate(LocalDate.parse(w.getLocalDate(), formatter));
                     return Stream.of(entity);
                 }).collect(Collectors.toList());
+    }
+
+    public List<WeatherEntity> requestToEntity(WeatherRequest weather) {
+
+        WeatherEntity entity = new WeatherEntity();
+        entity.setId(weather.getId());
+        entity.setCityCode(weather.getCityCode());
+        entity.setCityName(weather.getCityName());
+        entity.setMaximumTemperature(weather.getMaximumTemperature());
+        entity.setMinimumTemperature(weather.getMinimumTemperature());
+        entity.setWeather(weather.getWeather());
+        entity.setDate(weather.getDate());
+
+        return Stream.of(entity).collect(Collectors.toList());
     }
 
 }

@@ -1,0 +1,2 @@
+INSERT INTO waves_weather (id, agitation, hight, direction, wind, directionWind, cityCode, cityName,date)
+values (:id, :agitation, :hight, :direction, :wind, :directionWind, :cityCode, :cityName, :date);
