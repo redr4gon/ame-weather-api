@@ -43,5 +43,4 @@ public class WeatherMapper {
                     return Stream.of(entity);
                 }).collect(Collectors.toList());
     }
-
 }
