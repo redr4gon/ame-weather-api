@@ -1,10 +1,8 @@
 package br.com.amedigital.weather.api.service;
 
 import br.com.amedigital.weather.api.controller.request.WeatherRequest;
-import br.com.amedigital.weather.api.controller.response.CityResponse;
 import br.com.amedigital.weather.api.controller.response.WeatherResponse;
 import br.com.amedigital.weather.api.exception.NotFoundException;
-import br.com.amedigital.weather.api.mapper.CityMapper;
 import br.com.amedigital.weather.api.mapper.WeatherMapper;
 import br.com.amedigital.weather.api.model.ErrorMessages;
 import br.com.amedigital.weather.api.repository.WeatherRepository;
@@ -41,5 +39,19 @@ public class WeatherService {
                 .doOnError(throwable -> LOG.error("=== Error finding weather to city with code: {} ===", weatherRequest.getCityCode()))
                 .onErrorMap(throwable -> throwable)
                 .flatMap(entity -> Flux.just(mapper.entitytoResponse(entity)));
+    }
+
+    public Flux<WeatherResponse> findWeatherToCityName(WeatherRequest weatherRequest) {
+        return inpeClientService.findCityToName(weatherRequest.getNameCity())
+                .switchIfEmpty(Mono.error(new NotFoundException(ErrorMessages.GENERIC_NOT_FOUND_EXCEPTION)))
+                .flatMap(inpeCitiesResponse -> inpeCitiesResponse.getCities() == null || inpeCitiesResponse.getCities().isEmpty() ?
+                        Mono.error(new NotFoundException(ErrorMessages.GENERIC_NOT_FOUND_EXCEPTION)) : Mono.just(inpeCitiesResponse))
+                .flatMap(inpeCitiesResponse -> Mono.just(inpeCitiesResponse.getCities()))
+                .flatMap(cityResponses -> Mono.justOrEmpty(cityResponses.stream().findFirst()))
+                .switchIfEmpty(Mono.error(new NotFoundException(ErrorMessages.GENERIC_NOT_FOUND_EXCEPTION)))
+                .flatMapMany(cityResponse -> {
+                    weatherRequest.setCityCode(cityResponse.getCityCode().toString());
+                    return findWeatherToCity(weatherRequest);
+                });
     }
 }

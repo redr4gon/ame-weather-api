@@ -14,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponents;
+import reactor.core.publisher.Hooks;
 import reactor.core.publisher.Mono;
 
 import static org.slf4j.LoggerFactory.getLogger;
@@ -44,9 +45,9 @@ public class INPEClientService extends BaseWebClient {
     }
 
     @Trace(dispatcher = true)
-    public Mono<INPECitiesResponse> findCityToDescription(String cityDescription) {
+    public Mono<INPECitiesResponse> findCityToName(String cityDescription) {
         LOG.debug("==== Find city ====");
-
+        Hooks.onOperatorDebug();
         return handleGenericMono(HttpMethod.GET, urlCity(cityDescription), INPECitiesResponse.class, MediaType.APPLICATION_XML_VALUE)
                 .doOnError(throwable -> LOG.error("=== Error finding city ===", throwable));
     }
