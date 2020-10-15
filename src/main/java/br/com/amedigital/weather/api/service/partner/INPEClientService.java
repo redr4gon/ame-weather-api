@@ -2,6 +2,7 @@ package br.com.amedigital.weather.api.service.partner;
 
 import br.com.amedigital.weather.api.config.webclient.BaseWebClient;
 import br.com.amedigital.weather.api.model.NumberDaysWeather;
+import br.com.amedigital.weather.api.model.partner.response.INPECityResponse;
 import br.com.amedigital.weather.api.model.partner.response.INPEWavesWeatherCityResponse;
 import br.com.amedigital.weather.api.model.partner.response.INPEWeatherCityResponse;
 import com.newrelic.api.agent.Trace;
@@ -26,6 +27,7 @@ public class INPEClientService extends BaseWebClient {
     public static final String CITY_WEATHER = "cidade/#/previsao.xml";
     public static final String CITY_WEATHER_7_DAYS = "cidade/7dias/#/previsao.xml";
     public static final String CITY_WAVES_WEATHER = "cidade/#/dia/@/ondas.xml";
+    public static final String CITY = "listaCidades";
 
     @Autowired
     public INPEClientService(final WebClient webClient, @Value("${partner.url}") final String url) {
@@ -42,6 +44,14 @@ public class INPEClientService extends BaseWebClient {
     }
 
     @Trace(dispatcher = true)
+    public Mono<INPECityResponse> findToCityByName(String cityName) {
+        LOG.debug("==== Find city by name ====");
+
+        return handleGenericMono(HttpMethod.GET, urlCity(String.valueOf(cityName)), INPECityResponse.class, MediaType.APPLICATION_XML_VALUE)
+                .doOnError(throwable -> LOG.error("=== Error finding to city ===", throwable));
+    }
+
+    @Trace(dispatcher = true)
     public Mono<INPEWavesWeatherCityResponse> findWeatherWavesToCity(Integer cityCode, Integer day) {
         LOG.debug("==== Find weather waves to city ====");
         String url = StringUtils.replaceEach(CITY_WAVES_WEATHER, new String[]{"#", "@"}, new String[]{String.valueOf(cityCode), String.valueOf(day)});
@@ -53,6 +63,13 @@ public class INPEClientService extends BaseWebClient {
     protected UriComponents urlWeather(String url) {
         return urlBuilder()
                 .pathSegment(url)
+                .build();
+    }
+
+    protected UriComponents urlCity(String cityName) {
+        return urlBuilder()
+                .pathSegment(CITY)
+                .queryParam("city", cityName)
                 .build();
     }
 }

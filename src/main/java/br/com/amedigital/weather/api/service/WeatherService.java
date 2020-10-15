@@ -7,14 +7,18 @@ import br.com.amedigital.weather.api.exception.NotFoundException;
 import br.com.amedigital.weather.api.mapper.WavesWeatherMapper;
 import br.com.amedigital.weather.api.mapper.WeatherMapper;
 import br.com.amedigital.weather.api.model.ErrorMessages;
+import br.com.amedigital.weather.api.model.NumberDaysWeather;
 import br.com.amedigital.weather.api.repository.WavesWeatherRepository;
 import br.com.amedigital.weather.api.repository.WeatherRepository;
 import br.com.amedigital.weather.api.service.partner.INPEClientService;
+import br.com.amedigital.weather.api.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.Objects;
 
 @Service
 public class WeatherService {
@@ -50,6 +54,18 @@ public class WeatherService {
                 .doOnError(throwable -> LOG.error("=== Error finding weather to city with code: {} ===", cityCode))
                 .onErrorMap(throwable -> throwable)
                 .flatMap(entity -> Flux.just(mapper.entitytoResponse(entity)));
+    }
+
+    public Flux<WeatherResponse> findWeatherToCityByName(String cityName) {
+
+          return inpeClientService.findToCityByName(Util.removeSpace(Util.removeAccent(cityName)))
+                  .switchIfEmpty(Mono.error(new NotFoundException(ErrorMessages.GENERIC_NOT_FOUND_EXCEPTION)))
+                  .flatMapMany(city -> Objects.isNull(city.getCidades()) ?
+                          Mono.error(new NotFoundException(ErrorMessages.GENERIC_NOT_FOUND_EXCEPTION)) :
+                          Flux.fromStream(city.getCidades().stream()))
+                  .flatMap(c -> findWeatherToCity(c.getCode(), NumberDaysWeather.N4.getValue()))
+                  .doOnError(throwable -> LOG.error("=== Error finding city with cityName: {} ===", cityName))
+                  .onErrorMap(throwable -> throwable);
     }
 
     public Flux<WavesWeatherResponse> findWeatherWavesToCity(Integer cityCode, Integer day) {

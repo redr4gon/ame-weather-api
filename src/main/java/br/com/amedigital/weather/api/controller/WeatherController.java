@@ -35,6 +35,12 @@ public class WeatherController {
                 .doOnTerminate(() -> LOG.info("=== Finish finding weather to city ==="));
     }
 
+    @GetMapping("/find-by-name/{cityName}")
+    public Flux<WeatherResponse> findWeatherToCityByName(@PathVariable String cityName) {
+        return weatherService.findWeatherToCityByName(cityName)
+                .doOnTerminate(() -> LOG.info("=== Finish finding weather to city by name ==="));
+    }
+
     @GetMapping("/find-waves/{cityCode}/{dayCode}")
     public Flux<WavesWeatherResponse> findWeatherWavesToCity(@PathVariable String cityCode, @PathVariable String dayCode) {
          return weatherService.findWeatherWavesToCity(Integer.parseInt(cityCode), Integer.parseInt(dayCode))
