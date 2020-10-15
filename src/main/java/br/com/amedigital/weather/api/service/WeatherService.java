@@ -1,7 +1,10 @@
 package br.com.amedigital.weather.api.service;
 
+import br.com.amedigital.weather.api.controller.request.WeatherRequest;
+import br.com.amedigital.weather.api.controller.response.CityResponse;
 import br.com.amedigital.weather.api.controller.response.WeatherResponse;
 import br.com.amedigital.weather.api.exception.NotFoundException;
+import br.com.amedigital.weather.api.mapper.CityMapper;
 import br.com.amedigital.weather.api.mapper.WeatherMapper;
 import br.com.amedigital.weather.api.model.ErrorMessages;
 import br.com.amedigital.weather.api.repository.WeatherRepository;
@@ -11,8 +14,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
 
 @Service
 public class WeatherService {
@@ -31,13 +32,13 @@ public class WeatherService {
         this.mapper = weatherMapper;
     }
 
-    public Flux<WeatherResponse> findWeatherToCity(Integer cityCode) {
-        return inpeClientService.findWeatherToCity(cityCode)
+    public Flux<WeatherResponse> findWeatherToCity(WeatherRequest weatherRequest) {
+        return inpeClientService.findWeatherToCity(Integer.valueOf(weatherRequest.getCityCode()), Integer.valueOf(weatherRequest.getQtDays()))
                 .switchIfEmpty(Mono.error(new NotFoundException(ErrorMessages.GENERIC_NOT_FOUND_EXCEPTION)))
                 .flatMap(inpeWeatherCityResponse -> inpeWeatherCityResponse.getName() == null || inpeWeatherCityResponse.getName().equals("null") ?
                         Mono.error(new NotFoundException(ErrorMessages.GENERIC_NOT_FOUND_EXCEPTION)) : Mono.just(inpeWeatherCityResponse))
-                .flatMapMany(response ->  weatherRepository.save(mapper.INPEWeatherCityResponseToEntity(response, cityCode)))
-                .doOnError(throwable -> LOG.error("=== Error finding weather to city with code: {} ===", cityCode))
+                .flatMapMany(response ->  weatherRepository.save(mapper.INPEWeatherCityResponseToEntity(response, Integer.valueOf(weatherRequest.getCityCode()))))
+                .doOnError(throwable -> LOG.error("=== Error finding weather to city with code: {} ===", weatherRequest.getCityCode()))
                 .onErrorMap(throwable -> throwable)
                 .flatMap(entity -> Flux.just(mapper.entitytoResponse(entity)));
     }
