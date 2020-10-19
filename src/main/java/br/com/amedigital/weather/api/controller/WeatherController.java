@@ -5,12 +5,9 @@ import br.com.amedigital.weather.api.controller.response.WeatherResponse;
 import br.com.amedigital.weather.api.service.WeatherService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import javax.validation.Valid;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -53,18 +50,18 @@ public class WeatherController {
     @PostMapping(value = "/insert")
     public Mono<WeatherResponse> insertWeather(@RequestBody WeatherRequest weatherRequest) {
         return weatherService.insertWeather(weatherRequest)
-                .doOnTerminate(() -> LOG.info("=== Finish finding one weather to city ==="));
+                .doOnTerminate(() -> LOG.info("=== Finished entering a climate for the city ==="));
     }
 
     @PutMapping(value = "/update")
     public Mono<WeatherResponse> updateWeather(@RequestBody WeatherRequest weatherRequest) {
         return weatherService.updateWeather(weatherRequest)
-                .doOnTerminate(() -> LOG.info("=== Finish finding one weather to city ==="));
+                .doOnTerminate(() -> LOG.info("=== Finished changing a mood for the city ==="));
     }
 
     @DeleteMapping(value = "/delete/{id}")
     public Mono<Integer> deleteWeather(@PathVariable String id) {
         return weatherService.deleteWeather(id)
-                .doOnTerminate(() -> LOG.info("=== Finish finding one weather to city ==="));
+                .doOnTerminate(() -> LOG.info("=== Finished deleting a mood for the city ==="));
     }
 }
