@@ -1,5 +1,6 @@
 package br.com.amedigital.weather.api.mapper;
 
+import br.com.amedigital.weather.api.controller.request.WeatherRequest;
 import br.com.amedigital.weather.api.controller.response.WeatherResponse;
 import br.com.amedigital.weather.api.entity.WeatherEntity;
 import br.com.amedigital.weather.api.model.WeatherType;
@@ -18,6 +19,9 @@ public class WeatherMapper {
     public WeatherResponse entitytoResponse(WeatherEntity weatherEntity) {
 
         WeatherResponse weather = new WeatherResponse();
+        if (!weatherEntity.getId().isEmpty()) {
+            weather.setId(weatherEntity.getId());
+        }
         weather.setWeather(weatherEntity.getWeather());
         weather.setMaximumTemperature(weatherEntity.getMaximumTemperature());
         weather.setMinimumTemperature(weatherEntity.getMinimumTemperature());
@@ -42,5 +46,21 @@ public class WeatherMapper {
                     entity.setDate(LocalDate.parse(w.getLocalDate(), formatter));
                     return Stream.of(entity);
                 }).collect(Collectors.toList());
+    }
+
+    public WeatherEntity entitytoRequest(WeatherRequest weatherRequest) {
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        WeatherEntity entity = new WeatherEntity();
+        entity.setId(weatherRequest.getId());
+        entity.setCityCode(Integer.valueOf(weatherRequest.getCityCode()));
+        entity.setCityName(weatherRequest.getCityName());
+        entity.setMaximumTemperature(Integer.valueOf(weatherRequest.getMaximumTemperature()));
+        entity.setMinimumTemperature(Integer.valueOf(weatherRequest.getMinimumTemperature()));
+        entity.setWeather(WeatherType.valueOf(weatherRequest.getWeather()));
+        entity.setDate(LocalDate.parse(weatherRequest.getDate(), formatter));
+
+        return entity;
     }
 }

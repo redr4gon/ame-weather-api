@@ -6,11 +6,16 @@ import java.time.LocalDate;
 
 public class WeatherResponse {
 
+    private String id;
     private String weatherCity;
     private LocalDate weatherDate;
     private Integer maximumTemperature;
     private Integer minimumTemperature;
     private WeatherType weather;
+
+    public String getId() { return id; }
+
+    public void setId(String id) { this.id = id; }
 
     public Integer getMaximumTemperature() {
         return maximumTemperature;
@@ -55,7 +60,8 @@ public class WeatherResponse {
     @Override
     public String toString() {
         return "WeatherResponse{" +
-                "weatherCity='" + weatherCity + '\'' +
+                "id='" + id + '\'' +
+                ", weatherCity='" + weatherCity + '\'' +
                 ", weatherDate=" + weatherDate +
                 ", maximumTemperature=" + maximumTemperature +
                 ", minimumTemperature=" + minimumTemperature +

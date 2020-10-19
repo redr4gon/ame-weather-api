@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import javax.naming.NotContextException;
+
 @Service
 public class WeatherService {
 
@@ -42,7 +44,7 @@ public class WeatherService {
     }
 
     public Flux<WeatherResponse> findWeatherToCityName(WeatherRequest weatherRequest) {
-        return inpeClientService.findCityToName(weatherRequest.getNameCity())
+        return inpeClientService.findCityToName(weatherRequest.getCityName())
                 .switchIfEmpty(Mono.error(new NotFoundException(ErrorMessages.GENERIC_NOT_FOUND_EXCEPTION)))
                 .flatMap(inpeCitiesResponse -> inpeCitiesResponse.getCities() == null || inpeCitiesResponse.getCities().isEmpty() ?
                         Mono.error(new NotFoundException(ErrorMessages.GENERIC_NOT_FOUND_EXCEPTION)) : Mono.just(inpeCitiesResponse))
@@ -53,5 +55,35 @@ public class WeatherService {
                     weatherRequest.setCityCode(cityResponse.getCityCode().toString());
                     return findWeatherToCity(weatherRequest);
                 });
+    }
+
+    public Flux<WeatherResponse> findAllWeather() {
+        return weatherRepository.findAllWeather()
+                .switchIfEmpty(Mono.error(new NotFoundException(ErrorMessages.GENERIC_NOT_FOUND_EXCEPTION)))
+                .flatMap(entity -> Flux.just(mapper.entitytoResponse(entity)));
+    }
+
+    public Mono<WeatherResponse> findOneWeather(String id) {
+        return weatherRepository.findOneWeather(id)
+                .switchIfEmpty(Mono.error(new NotFoundException(ErrorMessages.GENERIC_NOT_FOUND_EXCEPTION)))
+                .flatMap(entity -> Mono.just(mapper.entitytoResponse(entity)));
+    }
+
+    public Mono<WeatherResponse> insertWeather(WeatherRequest weatherRequest) {
+        return weatherRepository.insertWeather(weatherRequest)
+                .switchIfEmpty(Mono.error(new NotFoundException(ErrorMessages.GENERIC_NOT_FOUND_EXCEPTION)))
+                .flatMap(entity -> Mono.just(mapper.entitytoResponse(entity)));
+    }
+
+    public Mono<WeatherResponse> updateWeather(WeatherRequest weatherRequest) {
+        return weatherRepository.updateWeather(weatherRequest)
+                .switchIfEmpty(Mono.empty())
+                .flatMap(entity -> Mono.just(mapper.entitytoResponse(entity)));
+    }
+
+    public Mono<Integer> deleteWeather(String id) {
+        return weatherRepository.deleteWeather(id)
+                .switchIfEmpty(Mono.error(new NotFoundException(ErrorMessages.GENERIC_NOT_FOUND_EXCEPTION)))
+                .flatMap(entity -> Mono.just(entity));
     }
 }

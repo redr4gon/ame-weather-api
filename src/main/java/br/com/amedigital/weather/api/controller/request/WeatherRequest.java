@@ -2,9 +2,18 @@ package br.com.amedigital.weather.api.controller.request;
 
 public class WeatherRequest {
 
+    private String id;
     private String qtDays;
+    private String maximumTemperature;
+    private String minimumTemperature;
+    private String weather;
     private String cityCode;
-    private String nameCity;
+    private String cityName;
+    private String date;
+
+    public String getId() { return id; }
+
+    public void setId(String id) { this.id = id; }
 
     public String getQtDays() {
         return qtDays;
@@ -14,6 +23,18 @@ public class WeatherRequest {
         this.qtDays = qtDays;
     }
 
+    public String getMaximumTemperature() { return maximumTemperature; }
+
+    public void setMaximumTemperature(String maximumTemperature) { this.maximumTemperature = maximumTemperature; }
+
+    public String getMinimumTemperature() { return minimumTemperature; }
+
+    public void setMinimumTemperature(String minimumTemperature) { this.minimumTemperature = minimumTemperature; }
+
+    public String getWeather() { return weather; }
+
+    public void setWeather(String weather) { this.weather = weather; }
+
     public String getCityCode() {
         return cityCode;
     }
@@ -22,11 +43,15 @@ public class WeatherRequest {
         this.cityCode = cityCode;
     }
 
-    public String getNameCity() {
-        return nameCity;
+    public String getCityName() {
+        return cityName;
     }
 
-    public void setNameCity(String nameCity) {
-        this.nameCity = nameCity;
+    public void setCityName(String cityName) {
+        this.cityName = cityName;
     }
+
+    public String getDate() { return date; }
+
+    public void setDate(String date) { this.date = date; }
 }
