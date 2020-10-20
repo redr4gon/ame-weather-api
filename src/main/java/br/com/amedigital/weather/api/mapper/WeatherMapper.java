@@ -19,7 +19,7 @@ public class WeatherMapper {
     public WeatherResponse entitytoResponse(WeatherEntity weatherEntity) {
 
         WeatherResponse weather = new WeatherResponse();
-        if (!weatherEntity.getId().isEmpty()) {
+        if (weatherEntity.getId() != null && !weatherEntity.getId().isEmpty()) {
             weather.setId(weatherEntity.getId());
         }
         weather.setWeather(weatherEntity.getWeather());
@@ -56,9 +56,18 @@ public class WeatherMapper {
         entity.setId(weatherRequest.getId());
         entity.setCityCode(Integer.valueOf(weatherRequest.getCityCode()));
         entity.setCityName(weatherRequest.getCityName());
-        entity.setMaximumTemperature(Integer.valueOf(weatherRequest.getMaximumTemperature()));
-        entity.setMinimumTemperature(Integer.valueOf(weatherRequest.getMinimumTemperature()));
-        entity.setWeather(WeatherType.valueOf(weatherRequest.getWeather()));
+        if (weatherRequest.getMaximumTemperature() != null) {
+            entity.setMaximumTemperature(Integer.valueOf(weatherRequest.getMaximumTemperature()));
+        }
+
+        if (weatherRequest.getMinimumTemperature() != null) {
+            entity.setMinimumTemperature(Integer.valueOf(weatherRequest.getMinimumTemperature()));
+        }
+
+        if (weatherRequest.getMaximumTemperature() != null) {
+            entity.setWeather(WeatherType.valueOf(weatherRequest.getWeather()));
+        }
+
         entity.setDate(LocalDate.parse(weatherRequest.getDate(), formatter));
 
         return entity;

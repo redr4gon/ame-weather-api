@@ -25,7 +25,7 @@ public class WeatherController {
 
     @PostMapping(produces = APPLICATION_JSON_VALUE)
     public Flux<WeatherResponse> findWeatherToCity(@RequestBody WeatherRequest weatherRequest) {
-        return weatherService.findWeatherToCity(weatherRequest)
+        return weatherService.findWeatherToCityAdvanced(weatherRequest)
                 .doOnTerminate(() -> LOG.info("=== Finish finding weather to city ==="));
     }
 

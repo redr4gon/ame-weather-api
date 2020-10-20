@@ -20,7 +20,13 @@ public class WeatherRepository extends BaseRepository {
         super(jdbi, jdbcScheduler);
     }
 
-    public Flux<WeatherEntity> save(List<WeatherEntity> entities) {
+    public Flux<WeatherEntity> save(List<WeatherEntity> entities, List<WeatherEntity> entities2) {
+
+        if (entities2 != null) {
+            entities2.stream().forEach(weatherEntity1 -> {
+                entities.removeIf(weatherEntity2 -> weatherEntity2.getDate().equals(weatherEntity1.getDate()));
+            });
+        }
 
         List<WeatherEntity> weatherEntities = new ArrayList<>();
 
@@ -34,13 +40,29 @@ public class WeatherRepository extends BaseRepository {
                 weatherEntities.add(entity);
             });
 
-            return weatherEntities;
+            if (entities2 == null) {
+                return weatherEntities;
+            } else {
+                entities2.addAll(weatherEntities);
+                return entities2;
+            }
         })).flatMapIterable(e -> e);
     }
 
     public Flux<WeatherEntity> findAllWeather() {
         return async(() -> jdbi.inTransaction(handle ->
             handle.createQuery(sqlLocator.locate("sql.findAll-weather"))
+                    .mapToBean(WeatherEntity.class)
+                    .list()
+        )).flatMapIterable(e -> e);
+    }
+
+    public Flux<WeatherEntity> findAllCityWeather(WeatherRequest weatherRequest) {
+        return async(() -> jdbi.inTransaction(handle ->
+            handle.createQuery(sqlLocator.locate("sql.findAll-city-weather"))
+                    .bind("cityCode", weatherRequest.getCityCode())
+                    .bind("date", weatherRequest.getDate())
+                    .bind("qtDays", Integer.valueOf(weatherRequest.getQtDays()))
                     .mapToBean(WeatherEntity.class)
                     .list()
         )).flatMapIterable(e -> e);
