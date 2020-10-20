@@ -34,14 +34,20 @@ public class WeatherService {
     }
 
     public Flux<WeatherResponse> findWeatherToCity(WeatherRequest weatherRequest) {
-        return inpeClientService.findWeatherToCity(Integer.valueOf(weatherRequest.getCityCode()), Integer.valueOf(weatherRequest.getQtDays()))
-                .switchIfEmpty(Mono.error(new NotFoundException(ErrorMessages.GENERIC_NOT_FOUND_EXCEPTION)))
-                .flatMap(inpeWeatherCityResponse -> inpeWeatherCityResponse.getName() == null || inpeWeatherCityResponse.getName().equals("null") ?
-                        Mono.error(new NotFoundException(ErrorMessages.GENERIC_NOT_FOUND_EXCEPTION)) : Mono.just(inpeWeatherCityResponse))
-                .flatMapMany(response ->  weatherRepository.save(mapper.INPEWeatherCityResponseToEntity(response, Integer.valueOf(weatherRequest.getCityCode())), null))
+        return weatherRepository.findAllCityWeather(weatherRequest)
+                .collectList()
+                .flatMapMany(weatherEntities -> {
+                    if (weatherEntities.size() == 0) {
+                        return findWeatherToCityEntity(weatherRequest);
+                    } else if (weatherEntities.size() < Integer.valueOf(weatherRequest.getQtDays())) {
+                        return findWeatherToCityEntityIntermediate(weatherEntities, weatherRequest.getQtDays());
+                    } else {
+                        return weatherRepository.findAllCityWeather(weatherRequest);
+                    }
+                } )
                 .doOnError(throwable -> LOG.error("=== Error finding weather to city with code: {} ===", weatherRequest.getCityCode()))
                 .onErrorMap(throwable -> throwable)
-                .flatMap(entity -> Flux.just(mapper.entitytoResponse(entity)));
+                .flatMap(entity -> Flux.just(mapper.entitytoResponse((WeatherEntity) entity)));
     }
 
     public Flux<WeatherEntity> findWeatherToCityEntity(WeatherRequest weatherRequest) {
@@ -55,7 +61,7 @@ public class WeatherService {
                 .flatMap(entity -> Flux.just(entity));
     }
 
-    public Flux<WeatherEntity> findWeatherToCityEntity2(List<WeatherEntity> weatherEntity, String qtDays) {
+    public Flux<WeatherEntity> findWeatherToCityEntityIntermediate(List<WeatherEntity> weatherEntity, String qtDays) {
         return inpeClientService.findWeatherToCity(Integer.valueOf(weatherEntity.get(0).getCityCode()), Integer.valueOf(qtDays))
                 .switchIfEmpty(Mono.error(new NotFoundException(ErrorMessages.GENERIC_NOT_FOUND_EXCEPTION)))
                 .flatMap(inpeWeatherCityResponse -> inpeWeatherCityResponse.getName() == null || inpeWeatherCityResponse.getName().equals("null") ?
@@ -68,23 +74,6 @@ public class WeatherService {
                 .doOnError(throwable -> LOG.error("=== Error finding weather to city with code: {} ===", weatherEntity.get(0).getCityCode()))
                 .onErrorMap(throwable -> throwable)
                 .flatMap(entity -> Flux.just(entity));
-    }
-
-    public Flux<WeatherResponse> findWeatherToCityAdvanced(WeatherRequest weatherRequest) {
-        return weatherRepository.findAllCityWeather(weatherRequest)
-                .collectList()
-                .flatMapMany(weatherEntities -> {
-                    if (weatherEntities.size() == 0) {
-                        return findWeatherToCityEntity(weatherRequest);
-                    } else if (weatherEntities.size() < Integer.valueOf(weatherRequest.getQtDays())) {
-                        return findWeatherToCityEntity2(weatherEntities, weatherRequest.getQtDays());
-                    } else {
-                        return weatherRepository.findAllCityWeather(weatherRequest);
-                    }
-                } )
-                .doOnError(throwable -> LOG.error("=== Error finding weather to city with code: {} ===", weatherRequest.getCityCode()))
-                .onErrorMap(throwable -> throwable)
-                .flatMap(entity -> Flux.just(mapper.entitytoResponse((WeatherEntity) entity)));
     }
 
     public Flux<WeatherResponse> findWeatherToCityName(WeatherRequest weatherRequest) {

@@ -22,7 +22,7 @@ public class WaveController {
         this.waveService = waveService;
     }
 
-    @PostMapping
+    @GetMapping
     public Mono<WaveResponse> findWave(@RequestBody WaveRequest waveRequest) {
         return waveService.findWave(waveRequest)
                 .doOnTerminate(() -> LOG.info("=== Finish finding city to description ==="));

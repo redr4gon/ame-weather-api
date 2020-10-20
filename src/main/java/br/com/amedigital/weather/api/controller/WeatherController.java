@@ -23,43 +23,47 @@ public class WeatherController {
         this.weatherService = weatherService;
     }
 
-    @PostMapping(produces = APPLICATION_JSON_VALUE)
+    @GetMapping(produces = APPLICATION_JSON_VALUE)
     public Flux<WeatherResponse> findWeatherToCity(@RequestBody WeatherRequest weatherRequest) {
-        return weatherService.findWeatherToCityAdvanced(weatherRequest)
+        return weatherService.findWeatherToCity(weatherRequest)
                 .doOnTerminate(() -> LOG.info("=== Finish finding weather to city ==="));
     }
 
-    @PostMapping(produces = APPLICATION_JSON_VALUE, value = "/name")
-    public Flux<WeatherResponse> findWeatherToCityName(@RequestBody WeatherRequest weatherRequest) {
+    @GetMapping(value = "/name")
+    public Flux<WeatherResponse> findWeatherToCityName(@RequestParam("cityName") String cityName, @RequestParam("qtDays") Integer qtDays) {
+        WeatherRequest weatherRequest = new WeatherRequest();
+        weatherRequest.setCityName(cityName);
+        weatherRequest.setQtDays(qtDays.toString());
+
         return weatherService.findWeatherToCityName(weatherRequest)
                 .doOnTerminate(() -> LOG.info("=== Finish finding weather to city ==="));
     }
 
-    @GetMapping(value = "/lista")
+    @GetMapping(value = "/")
     public Flux<WeatherResponse> findAllWeather() {
         return weatherService.findAllWeather()
                 .doOnTerminate(() -> LOG.info("=== Finish finding all weather to city ==="));
     }
 
-    @PostMapping(value = "/one")
-    public Mono<WeatherResponse> findOneWeather(@RequestParam String id) {
+    @GetMapping(value = "/{id}")
+    public Mono<WeatherResponse> findOneWeather(@PathVariable String id) {
         return weatherService.findOneWeather(id)
                 .doOnTerminate(() -> LOG.info("=== Finish finding one weather to city ==="));
     }
 
-    @PostMapping(value = "/insert")
+    @PostMapping(value = "/")
     public Mono<WeatherResponse> insertWeather(@RequestBody WeatherRequest weatherRequest) {
         return weatherService.insertWeather(weatherRequest)
                 .doOnTerminate(() -> LOG.info("=== Finished entering a climate for the city ==="));
     }
 
-    @PutMapping(value = "/update")
+    @PutMapping(value = "/")
     public Mono<WeatherResponse> updateWeather(@RequestBody WeatherRequest weatherRequest) {
         return weatherService.updateWeather(weatherRequest)
                 .doOnTerminate(() -> LOG.info("=== Finished changing a mood for the city ==="));
     }
 
-    @DeleteMapping(value = "/delete/{id}")
+    @DeleteMapping(value = "/{id}")
     public Mono<Integer> deleteWeather(@PathVariable String id) {
         return weatherService.deleteWeather(id)
                 .doOnTerminate(() -> LOG.info("=== Finished deleting a mood for the city ==="));
