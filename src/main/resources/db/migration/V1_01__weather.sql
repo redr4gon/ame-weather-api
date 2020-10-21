@@ -8,5 +8,3 @@ CREATE TABLE `weather` (
   `date` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
-

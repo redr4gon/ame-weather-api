@@ -1,3 +1,6 @@
-SELECT * FROM weather w order by cityname, date;
+SELECT *
+  FROM weather w
+<where>
+ORDER BY cityname, date;
 
 

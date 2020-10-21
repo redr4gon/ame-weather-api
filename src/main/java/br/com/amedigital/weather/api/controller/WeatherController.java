@@ -40,8 +40,8 @@ public class WeatherController {
     }
 
     @GetMapping(value = "/")
-    public Flux<WeatherResponse> findAllWeather() {
-        return weatherService.findAllWeather()
+    public Flux<WeatherResponse> findAllWeather(@RequestBody WeatherRequest weatherRequest) {
+        return weatherService.findAllWeather(weatherRequest)
                 .doOnTerminate(() -> LOG.info("=== Finish finding all weather to city ==="));
     }
 

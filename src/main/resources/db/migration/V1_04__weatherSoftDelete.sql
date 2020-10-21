@@ -1,0 +1,1 @@
+ALTER TABLE `weather` ADD isdelete INTEGER DEFAULT 0 NOT NULL;

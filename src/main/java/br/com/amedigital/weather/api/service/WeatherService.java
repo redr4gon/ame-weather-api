@@ -90,8 +90,8 @@ public class WeatherService {
                 });
     }
 
-    public Flux<WeatherResponse> findAllWeather() {
-        return weatherRepository.findAllWeather()
+    public Flux<WeatherResponse> findAllWeather(WeatherRequest weatherRequest) {
+        return weatherRepository.findAllWeather(weatherRequest)
                 .switchIfEmpty(Mono.error(new NotFoundException(ErrorMessages.GENERIC_NOT_FOUND_EXCEPTION)))
                 .flatMap(entity -> Flux.just(mapper.entitytoResponse(entity)));
     }

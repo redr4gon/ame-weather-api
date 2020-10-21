@@ -49,9 +49,10 @@ public class WeatherRepository extends BaseRepository {
         })).flatMapIterable(e -> e);
     }
 
-    public Flux<WeatherEntity> findAllWeather() {
+    public Flux<WeatherEntity> findAllWeather(WeatherRequest weatherRequest) {
         return async(() -> jdbi.inTransaction(handle ->
             handle.createQuery(sqlLocator.locate("sql.findAll-weather"))
+                    .define("where", setWhere(weatherRequest))
                     .mapToBean(WeatherEntity.class)
                     .list()
         )).flatMapIterable(e -> e);
@@ -118,5 +119,35 @@ public class WeatherRepository extends BaseRepository {
                         .bind("id", id)
                         .execute()
         ));
+    }
+
+    private String setWhere(WeatherRequest weatherRequest) {
+        StringBuilder where = new StringBuilder("WHERE ");
+
+        if (!weatherRequest.getDate().isEmpty()) {
+            where.append("date = '").append(weatherRequest.getDate()).append("'");
+        }
+
+        if (!weatherRequest.getMaximumTemperature().isEmpty()) {
+            if (where.length() > 6) {
+                where.append(" and ");
+            }
+            where.append("maximumTemperature = ").append(weatherRequest.getMaximumTemperature());
+        }
+
+        if (!weatherRequest.getMinimumTemperature().isEmpty()) {
+            if (where.length() > 6) {
+                where.append(" and ");
+            }
+            where.append("minimumTemperature = ").append(weatherRequest.getMinimumTemperature());
+        }
+
+        if (where.length() > 6) {
+            where.append(" and ");
+        }
+
+        where.append("isdelete <> 1");
+
+        return where.toString();
     }
 }

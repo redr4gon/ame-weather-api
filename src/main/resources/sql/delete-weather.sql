@@ -1,3 +1,4 @@
-DELETE FROM weather WHERE ID =:id;
+UPDATE weather SET isdelete = 1
+WHERE ID =:id;
 
 
