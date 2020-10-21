@@ -3,7 +3,8 @@ UPDATE weather SET maximumTemperature = :maximumTemperature,
                    weather = :weather,
                    cityCode = :cityCode,
                    cityName = :cityName,
-                   date = :date
+                   date = :date,
+                   updatedAt = CURRENT_TIMESTAMP()
 WHERE ID =:id;
 
 
