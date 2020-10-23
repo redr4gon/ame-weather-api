@@ -62,7 +62,6 @@ public class WeatherRepository extends BaseRepository {
         return async(() -> jdbi.inTransaction(handle ->
             handle.createQuery(sqlLocator.locate("sql.findAll-city-weather"))
                     .bind("cityCode", weatherRequest.getCityCode())
-                    .bind("date", weatherRequest.getDate())
                     .bind("qtDays", Integer.valueOf(weatherRequest.getQtDays()))
                     .mapToBean(WeatherEntity.class)
                     .list()
