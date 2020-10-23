@@ -1,6 +1,7 @@
 package br.com.amedigital.weather.api.model.partner.response;
 
 import javax.xml.bind.annotation.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @XmlRootElement(name = "cidade")
@@ -9,7 +10,7 @@ public class INPEWeatherCityResponse {
     private String name;
     private String state;
     private String updatedAt;
-    private List<Weather> weather;
+    private List<Weather> weathers;
 
     public static class Weather {
 
@@ -83,11 +84,19 @@ public class INPEWeatherCityResponse {
     }
 
     @XmlElement(name = "previsao")
-    public List<Weather> getWeather() {
-        return weather;
+    public List<Weather> getWeathers() {
+        return weathers;
     }
 
-    public void setWeather(List<Weather> weather) {
-        this.weather = weather;
+    public void setWeathers(List<Weather> weathers) {
+        this.weathers = weathers;
+    }
+
+    public void addWeathers(Weather weather) {
+        if (this.weathers == null) {
+            this.weathers = new ArrayList<>();
+        }
+
+        this.weathers.add(weather);
     }
 }

@@ -2,6 +2,7 @@ package br.com.amedigital.weather.api.model.partner.response;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.ArrayList;
 import java.util.List;
 
 @XmlRootElement(name = "cidades")
@@ -35,4 +36,11 @@ public class INPECitiesResponse {
     public List<City> getCities() { return cities; }
 
     public void setCities(List<City> cities) { this.cities = cities; }
+
+    public void addCities(City city) {
+        if (this.cities == null) {
+            this.cities = new ArrayList<>();
+        }
+        this.cities.add(city);
+    }
 }

@@ -35,7 +35,7 @@ public class WeatherMapper {
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-        return inpeWeatherCityResponse.getWeather().stream()
+        return inpeWeatherCityResponse.getWeathers().stream()
                 .flatMap(w ->  {
                     WeatherEntity entity = new WeatherEntity();
                     entity.setCityCode(code);

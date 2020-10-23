@@ -47,7 +47,7 @@ public class WeatherService {
                 } )
                 .doOnError(throwable -> LOG.error("=== Error finding weather to city with code: {} ===", weatherRequest.getCityCode()))
                 .onErrorMap(throwable -> throwable)
-                .flatMap(entity -> Flux.just(mapper.entitytoResponse((WeatherEntity) entity)));
+                .flatMap(entity -> Flux.just(mapper.entitytoResponse(entity)));
     }
 
     public Flux<WeatherEntity> findWeatherToCityEntity(WeatherRequest weatherRequest) {

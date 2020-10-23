@@ -11,6 +11,20 @@ public class WeatherRequest {
     private String cityName;
     private String date;
 
+    public WeatherRequest() {
+    }
+
+    public WeatherRequest(String id, String qtDays, String maximumTemperature, String minimumTemperature, String weather, String cityCode, String cityName, String date) {
+        this.id = id;
+        this.qtDays = qtDays;
+        this.maximumTemperature = maximumTemperature;
+        this.minimumTemperature = minimumTemperature;
+        this.weather = weather;
+        this.cityCode = cityCode;
+        this.cityName = cityName;
+        this.date = date;
+    }
+
     public String getId() { return id; }
 
     public void setId(String id) { this.id = id; }
