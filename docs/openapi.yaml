@@ -1,23 +1,354 @@
 openapi: 3.0.0
 info:
-  title: 'Ame Digital - Weather API'
   version: '1.0'
-  description: 'Projeto
+  title: Ame Digital - Weather API
+  description: Projeto
   contact:
-    name: 'Ame Digital - Weather API'
+    name: Ame Digital - Weather API
     email: amedigital@exactaworks.com
     url: 'http://www.amedigital.com/'
   license:
     name: AME
 tags:
   - name: weather
-    description: Refere-se a busca
+    description: Refere-se a busca de climas
 paths:
   /weather:
     get:
-      operationId: findWeather
-      summary: 'Busca'
+      summary: Busca o clima pelo código da cidade.
+      operationId: findWeatherToCity
+      parameters:
+        - name: cityCode
+          in: header
+          description: código da cidade
+          required: true
+          style: simple
+          schema:
+            type: string
+        - name: qtDays
+          in: header
+          description: quantidade de dias de previsão de tempo
+          schema:
+            type: string
+          required: true
+          style: simple
       tags:
         - weather
       responses:
-        '200'
+        '200':
+          description: weather response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/weather'
+        default:
+          description: recurso não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /weather/name:
+    get:
+      summary: Busca o clima pelo nome da cidade.
+      operationId: findWeatherToCityName
+      parameters:
+        - name: cityName
+          in: query
+          description: nome da cidade
+          required: true
+          style: form
+          schema:
+            type: string
+        - name: qtDays
+          in: query
+          description: quantidade de dias de previsão de tempo
+          schema:
+            type: string
+          required: true
+          style: form
+      tags:
+        - weather
+      responses:
+        '200':
+          description: weather response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/weather'
+        default:
+          description: recurso não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /weather/:
+    get:
+      summary: Busca todos os climas cadastrados no banco de dados
+      operationId: findAllWeather
+      parameters:
+        - name: date
+          in: header
+          description: data do clima
+          required: false
+          style: simple
+          schema:
+            type: string
+            format: yyyy-mm-aa
+        - name: maximumTemperature
+          in: header
+          description: temperatura máxima do clima
+          schema:
+            type: string
+          required: false
+          style: simple
+        - name: minimumTemperature
+          in: header
+          description: temperatura mínima do clima
+          schema:
+            type: string
+          required: false
+          style: simple
+      tags:
+        - weather
+      responses:
+        '200':
+          description: weather response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/weather'
+        default:
+          description: recurso não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/weather/{id}':
+    get:
+      summary: Busca um único clima cadastrado no banco de dados
+      operationId: findOneWeather
+      parameters:
+        - name: id
+          in: path
+          description: id do clima cadastrado no banco de dados
+          required: true
+          schema:
+            type: string
+            format: UUID
+      tags:
+        - weather
+      responses:
+        '200':
+          description: weather response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/weather'
+        default:
+          description: recurso não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/weather/ ':
+    post:
+      summary: Insere o clima no banco de dados
+      operationId: insertWeather
+      parameters:
+        - name: maximumTemperature
+          in: header
+          description: Temperatura máxima do clima
+          required: true
+          schema:
+            type: string
+            format: UUID
+          style: simple
+        - name: minimumTemperature
+          in: header
+          description: Temperatura mínima do clima
+          required: true
+          schema:
+            type: string
+          style: simple
+        - name: weather
+          in: header
+          description: Sigla das condições do tempo
+          required: true
+          schema:
+            type: string
+          style: simple
+        - name: cityCode
+          in: header
+          description: Código da cidade da previsão do clima
+          required: true
+          schema:
+            type: string
+          style: simple
+        - name: cityName
+          in: header
+          description: Nome da cidade da previsão do clima
+          required: true
+          schema:
+            type: string
+          style: simple
+        - name: date
+          in: header
+          description: Data da previsão do clima
+          required: true
+          schema:
+            type: string
+            format: yyyy-mm-aa
+          style: simple
+      tags:
+        - weather
+      responses:
+        '200':
+          description: weather response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/weather'
+        default:
+          description: recurso não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/weather/  ':
+    put:
+      summary: altera o clima no banco de dados
+      operationId: updateWeather
+      parameters:
+        - name: id
+          in: header
+          description: id do clima cadastrado no banco de dados
+          required: true
+          schema:
+            type: string
+            format: UUID
+          style: simple
+        - name: maximumTemperature
+          in: header
+          description: Temperatura máxima do clima
+          required: true
+          schema:
+            type: string
+          style: simple
+        - name: minimumTemperature
+          in: header
+          description: Temperatura mínima do clima
+          required: true
+          schema:
+            type: string
+          style: simple
+        - name: weather
+          in: header
+          description: Sigla das condições do tempo
+          required: true
+          schema:
+            type: string
+          style: simple
+        - name: cityCode
+          in: header
+          description: Código da cidade da previsão do clima
+          required: true
+          schema:
+            type: string
+          style: simple
+        - name: cityName
+          in: header
+          description: Nome da cidade da previsão do clima
+          required: true
+          schema:
+            type: string
+          style: simple
+        - name: date
+          in: header
+          description: Data da previsão do clima
+          required: true
+          schema:
+            type: string
+            format: yyyy-mm-aa
+          style: simple
+      tags:
+        - weather
+      responses:
+        '200':
+          description: weather response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/weather'
+        default:
+          description: recurso não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/weather/{id} ':
+    delete:
+      summary: Deleta o clima no banco de dados
+      operationId: deleteWeather
+      parameters:
+        - name: id
+          in: path
+          description: id do clima cadastrado no banco de dados
+          required: true
+          schema:
+            type: string
+            format: UUID
+      tags:
+        - weather
+      responses:
+        '200':
+          description: weather response
+          content:
+            application/json:
+              schema:
+                type: integer
+        default:
+          description: recurso não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    weather:
+      type: object
+      required:
+        - id
+        - weatherCity
+        - weatherDate
+        - maximumTemperature
+        - minimumTemperature
+        - weather
+      properties:
+        id:
+          type: string
+        weatherCity:
+          type: string
+        weatherDate:
+          type: string
+        maximumTemperature:
+          type: string
+        minimumTemperature:
+          type: string
+        weather:
+          type: string
+    Error:
+      type: object
+      required:
+        - error
+        - errorDescription
+      properties:
+        error:
+          type: string
+        message:
+          type: string

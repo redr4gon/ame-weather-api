@@ -23,7 +23,7 @@ public class WeatherController {
         this.weatherService = weatherService;
     }
 
-    @GetMapping(produces = APPLICATION_JSON_VALUE)
+    @GetMapping
     public Flux<WeatherResponse> findWeatherToCity(@RequestBody WeatherRequest weatherRequest) {
         return weatherService.findWeatherToCity(weatherRequest)
                 .doOnTerminate(() -> LOG.info("=== Finish finding weather to city ==="));
