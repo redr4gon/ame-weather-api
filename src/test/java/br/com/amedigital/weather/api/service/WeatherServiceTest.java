@@ -65,7 +65,7 @@ public class WeatherServiceTest {
         when(weatherMapper.entitytoResponse(any())).thenReturn(weatherResponse);
 
         StepVerifier.create(weatherService.findWeatherToCity(weatherRequest))
-                .expectNextMatches(weatherResponse1 -> weatherResponse1 != null)
+                .expectNextMatches(weatherResponse -> weatherResponse.equals(this.weatherResponse))
                 .expectComplete()
                 .verify();
     }
@@ -74,10 +74,10 @@ public class WeatherServiceTest {
     public void findWeatherToCityEntityWithSucess() {
         when(inpeClientService.findWeatherToCity(any(), any())).thenReturn(Mono.just(inpeWeatherCityResponse));
         when(weatherMapper.INPEWeatherCityResponseToEntity(any(), any())).thenReturn(new ArrayList<WeatherEntity>());
-        when(weatherRepository.save(any(), any())).thenReturn(Flux.just(new WeatherEntity()));
+        when(weatherRepository.save(any(), any())).thenReturn(Flux.just(weatherEntity));
 
         StepVerifier.create(weatherService.findWeatherToCityEntity(weatherRequest))
-                .expectNextMatches(weatherEntity -> weatherEntity != null)
+                .expectNextMatches(weatherEntity -> weatherEntity.equals(this.weatherEntity))
                 .expectComplete()
                 .verify();
     }
@@ -86,10 +86,10 @@ public class WeatherServiceTest {
     public void findWeatherToCityEntityIntermediateWithSucess() {
         when(inpeClientService.findWeatherToCity(any(), any())).thenReturn(Mono.just(inpeWeatherCityResponse));
         when(weatherMapper.INPEWeatherCityResponseToEntity(any(), any())).thenReturn(new ArrayList<WeatherEntity>());
-        when(weatherRepository.save(any(), any())).thenReturn(Flux.just(new WeatherEntity()));
+        when(weatherRepository.save(any(), any())).thenReturn(Flux.just(weatherEntity));
 
         StepVerifier.create(weatherService.findWeatherToCityEntityIntermediate(listWeatherEntity, "4"))
-                .expectNextMatches(weatherEntity1 -> weatherEntity1 != null)
+                .expectNextMatches(weatherEntity -> weatherEntity.equals(this.weatherEntity))
                 .expectComplete()
                 .verify();
     }
@@ -103,7 +103,7 @@ public class WeatherServiceTest {
         when(weatherMapper.entitytoResponse(any())).thenReturn(weatherResponse);
 
         StepVerifier.create(weatherService.findWeatherToCityName(weatherRequest))
-                .expectNextMatches(weatherResponse -> weatherResponse != null)
+                .expectNextMatches(weatherResponse -> weatherResponse.equals(this.weatherResponse))
                 .expectComplete()
                 .verify();
     }
@@ -114,7 +114,7 @@ public class WeatherServiceTest {
         when(weatherMapper.entitytoResponse(any())).thenReturn(weatherResponse);
 
         StepVerifier.create(weatherService.findAllWeather(weatherRequest))
-                .expectNextMatches(weatherResponse1 -> weatherResponse1 != null)
+                .expectNextMatches(weatherResponse -> weatherResponse.equals(this.weatherResponse))
                 .expectComplete()
                 .verify();
     }
@@ -122,10 +122,10 @@ public class WeatherServiceTest {
     @Test
     public void findOneWeatherWithSucess() {
         when(weatherRepository.findOneWeather(any())).thenReturn(Mono.just(weatherEntity));
-        when(weatherMapper.entitytoResponse(any())).thenReturn(new WeatherResponse());
+        when(weatherMapper.entitytoResponse(any())).thenReturn(weatherResponse);
 
         StepVerifier.create(weatherService.findOneWeather(weatherEntity.getId()))
-                .expectNextMatches(weatherResponse -> weatherResponse != null)
+                .expectNextMatches(weatherResponse -> weatherResponse.equals(this.weatherResponse))
                 .expectComplete()
                 .verify();
     }
@@ -136,7 +136,7 @@ public class WeatherServiceTest {
         when(weatherMapper.entitytoResponse(any())).thenReturn(weatherResponse);
 
         StepVerifier.create(weatherService.insertWeather(weatherRequest))
-                .expectNextMatches(weatherResponse -> weatherResponse != null)
+                .expectNextMatches(weatherResponse -> weatherResponse.equals(this.weatherResponse))
                 .expectComplete()
                 .verify();
     }
@@ -147,7 +147,7 @@ public class WeatherServiceTest {
         when(weatherMapper.entitytoResponse(any())).thenReturn(weatherResponse);
 
         StepVerifier.create(weatherService.updateWeather(weatherRequest))
-                .expectNextMatches(weatherResponse -> weatherResponse != null)
+                .expectNextMatches(weatherResponse -> weatherResponse.equals(this.weatherResponse))
                 .expectComplete()
                 .verify();
     }
@@ -159,7 +159,6 @@ public class WeatherServiceTest {
         StepVerifier.create(weatherService.deleteWeather(weatherEntity.getId()))
                 .expectNextMatches(weatherEntity -> weatherEntity == 1)
                 .expectComplete()
-//                .log()
                 .verify();
     }
 

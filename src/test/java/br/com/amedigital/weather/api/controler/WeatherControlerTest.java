@@ -45,7 +45,7 @@ public class WeatherControlerTest {
         when(weatherService.findWeatherToCity(any())).thenReturn(Flux.just(weatherResponse));
 
         StepVerifier.create(weatherController.findWeatherToCity(weatherRequest))
-                .expectNextMatches(weatherResponse -> weatherResponse != null)
+                .expectNextMatches(weatherResponse -> weatherResponse.equals(this.weatherResponse))
                 .expectComplete()
                 .verify();
     }
@@ -55,7 +55,7 @@ public class WeatherControlerTest {
         when(weatherService.findWeatherToCityName(any())).thenReturn(Flux.just(weatherResponse));
 
         StepVerifier.create(weatherController.findWeatherToCityName(weatherRequest.getCityName(), Integer.valueOf(weatherRequest.getQtDays())))
-                .expectNextMatches(weatherResponse -> weatherResponse != null)
+                .expectNextMatches(weatherResponse -> weatherResponse.equals(this.weatherResponse))
                 .expectComplete()
                 .verify();
     }
@@ -65,7 +65,7 @@ public class WeatherControlerTest {
         when(weatherService.findAllWeather(any())).thenReturn(Flux.just(weatherResponse));
 
         StepVerifier.create(weatherController.findAllWeather(weatherRequest))
-                .expectNextMatches(weatherResponse -> weatherResponse != null)
+                .expectNextMatches(weatherResponse -> weatherResponse.equals(this.weatherResponse))
                 .expectComplete()
                 .verify();
     }
@@ -75,7 +75,7 @@ public class WeatherControlerTest {
         when(weatherService.findOneWeather(any())).thenReturn(Mono.just(weatherResponse));
 
         StepVerifier.create(weatherController.findOneWeather(weatherRequest.getId()))
-                .expectNextMatches(weatherResponse -> weatherResponse != null)
+                .expectNextMatches(weatherResponse -> weatherResponse.equals(this.weatherResponse))
                 .expectComplete()
                 .verify();
     }
@@ -85,7 +85,7 @@ public class WeatherControlerTest {
         when(weatherService.insertWeather(any())).thenReturn(Mono.just(weatherResponse));
 
         StepVerifier.create(weatherController.insertWeather(weatherRequest))
-                .expectNextMatches(weatherResponse -> weatherResponse != null)
+                .expectNextMatches(weatherResponse -> weatherResponse.equals(this.weatherResponse))
                 .expectComplete()
                 .verify();
     }
@@ -95,7 +95,7 @@ public class WeatherControlerTest {
         when(weatherService.updateWeather(any())).thenReturn(Mono.just(weatherResponse));
 
         StepVerifier.create(weatherController.updateWeather(weatherRequest))
-                .expectNextMatches(weatherResponse -> weatherResponse != null)
+                .expectNextMatches(weatherResponse -> weatherResponse.equals(this.weatherResponse))
                 .expectComplete()
                 .verify();
     }
