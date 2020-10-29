@@ -2,7 +2,9 @@ package br.com.amedigital.weather.api.entity;
 
 import br.com.amedigital.weather.api.model.WeatherType;
 
+
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class WeatherEntity {
 
@@ -13,6 +15,9 @@ public class WeatherEntity {
     private Integer cityCode;
     private String cityName;
     private LocalDate date;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    private LocalDateTime deletedAt;
 
     public String getId() {
         return id;
@@ -70,6 +75,30 @@ public class WeatherEntity {
         this.date = date;
     }
 
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public LocalDateTime getDeletedAt() {
+        return deletedAt;
+    }
+
+    public void setDeletedAt(LocalDateTime deletedAt) {
+        this.deletedAt = deletedAt;
+    }
+
     @Override
     public String toString() {
         return "WeatherEntity{" +
@@ -80,6 +109,9 @@ public class WeatherEntity {
                 ", cityCode=" + cityCode +
                 ", cityName='" + cityName + '\'' +
                 ", date=" + date +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                ", deletedAt=" + deletedAt +
                 '}';
     }
 }

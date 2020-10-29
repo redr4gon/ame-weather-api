@@ -1,7 +1,7 @@
 package br.com.amedigital.weather.api.mapper;
 
 import br.com.amedigital.weather.api.controller.response.WavesWeatherResponse;
-import br.com.amedigital.weather.api.entity.WavesWeatherEntity;
+import br.com.amedigital.weather.api.entity.WaveEntity;
 import br.com.amedigital.weather.api.model.partner.response.INPEWavesWeatherCityResponse;
 import org.springframework.stereotype.Component;
 
@@ -14,27 +14,27 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Component
-public class WavesWeatherMapper {
+public class WaveMapper {
 
-   public WavesWeatherResponse entityToResponse(WavesWeatherEntity wavesWeatherEntity) {
+   public WavesWeatherResponse entityToResponse(WaveEntity waveEntity) {
 
         WavesWeatherResponse wavesWeather = new WavesWeatherResponse();
-        wavesWeather.setAgitation(wavesWeatherEntity.getAgitation());
-        wavesWeather.setCityName(wavesWeatherEntity.getCityName());
-        wavesWeather.setHight(wavesWeatherEntity.getHight());
-        wavesWeather.setDate(wavesWeatherEntity.getDate());
-        wavesWeather.setDirection(wavesWeatherEntity.getDirection());
-        wavesWeather.setDirectionWind(wavesWeatherEntity.getDirectionWind());
-        wavesWeather.setWind(wavesWeatherEntity.getWind());
+        wavesWeather.setAgitation(waveEntity.getAgitation());
+        wavesWeather.setCityName(waveEntity.getCityName());
+        wavesWeather.setHight(waveEntity.getHight());
+        wavesWeather.setDate(waveEntity.getDate());
+        wavesWeather.setDirection(waveEntity.getDirection());
+        wavesWeather.setDirectionWind(waveEntity.getDirectionWind());
+        wavesWeather.setWind(waveEntity.getWind());
 
         return wavesWeather;
     }
 
-    public List<WavesWeatherEntity> INPEWavesWeatherCityResponseToEntity(INPEWavesWeatherCityResponse inpeWavesWeatherCityResponse, Integer code) {
+    public List<WaveEntity> INPEWavesWeatherCityResponseToEntity(INPEWavesWeatherCityResponse inpeWavesWeatherCityResponse, Integer code) {
 
-        List<WavesWeatherEntity>  retorno =  inpeWavesWeatherCityResponse.getPeriodWeather().stream()
+        List<WaveEntity>  retorno =  inpeWavesWeatherCityResponse.getPeriodWeather().stream()
                 .flatMap(pw ->  {
-                    WavesWeatherEntity entity = new WavesWeatherEntity();
+                    WaveEntity entity = new WaveEntity();
                     entity.setCityCode(code);
                     entity.setCityName(inpeWavesWeatherCityResponse.getName());
                     entity.setDate(getDatePeriodWavesWeather(pw));

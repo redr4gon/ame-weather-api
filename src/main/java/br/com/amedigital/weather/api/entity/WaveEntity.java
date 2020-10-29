@@ -3,7 +3,7 @@ package br.com.amedigital.weather.api.entity;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-public class WavesWeatherEntity {
+public class WaveEntity {
 
     private String id;
     private String agitation;

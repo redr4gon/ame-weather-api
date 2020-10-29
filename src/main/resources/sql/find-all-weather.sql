@@ -1,1 +1,1 @@
-SELECT * FROM weather;
+SELECT * FROM weather <where>;

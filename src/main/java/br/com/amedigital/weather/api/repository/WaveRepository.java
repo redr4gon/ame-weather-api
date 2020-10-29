@@ -1,7 +1,6 @@
 package br.com.amedigital.weather.api.repository;
 
-import br.com.amedigital.weather.api.entity.WavesWeatherEntity;
-import br.com.amedigital.weather.api.entity.WeatherEntity;
+import br.com.amedigital.weather.api.entity.WaveEntity;
 import org.jdbi.v3.core.Jdbi;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
@@ -9,18 +8,19 @@ import reactor.core.scheduler.Scheduler;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Repository
-public class WavesWeatherRepository extends BaseRepository {
+public class WaveRepository extends BaseRepository {
 
-    public WavesWeatherRepository(Jdbi jdbi, Scheduler jdbcScheduler) {
+    public WaveRepository(Jdbi jdbi, Scheduler jdbcScheduler) {
         super(jdbi, jdbcScheduler);
     }
 
-    public Flux<WavesWeatherEntity> save(List<WavesWeatherEntity> entities) {
+    public Flux<WaveEntity> save(List<WaveEntity> entities) {
 
-        List<WavesWeatherEntity> wavesWeatherEntities = new ArrayList<>();
+        List<WaveEntity> wavesWeatherEntities = new ArrayList<>();
 
         return async(() -> jdbi.inTransaction(handle -> {
 

@@ -41,16 +41,10 @@ public class WeatherController {
                 .doOnTerminate(() -> LOG.info("=== Finish finding weather to city by name ==="));
     }
 
-    @GetMapping("/find-waves/{cityCode}/{dayCode}")
-    public Flux<WavesWeatherResponse> findWeatherWavesToCity(@PathVariable String cityCode, @PathVariable String dayCode) {
-         return weatherService.findWeatherWavesToCity(Integer.parseInt(cityCode), Integer.parseInt(dayCode))
-                 .doOnTerminate(() -> LOG.info("=== Finish finding waves weather to city ==="));
-    }
-
     //CRUD
-    @GetMapping("/find-all")
-    public Flux<WeatherResponse> findAll() {
-        return weatherService.findAll()
+    @PostMapping("/find-all")
+    public Flux<WeatherResponse> findAll(@RequestBody WeatherRequest weather) {
+        return weatherService.findAll(weather)
                 .doOnTerminate(() -> LOG.info("=== Finish finding all weather ==="));
     }
 
@@ -72,9 +66,9 @@ public class WeatherController {
                 .doOnTerminate(() -> LOG.info("=== Finish update weather ==="));
     }
 
-    @DeleteMapping("/{id}")
-    public Mono<Void> delete(@PathVariable String id) {
-         return weatherService.delete(id)
+    @DeleteMapping("/{id}/soft")
+    public Mono<Void> softDelete(@PathVariable String id) {
+         return weatherService.softDelete(id)
                  .doOnTerminate(() -> LOG.info("=== Finish delete weather ==="));
     }
 }

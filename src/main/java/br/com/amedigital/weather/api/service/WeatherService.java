@@ -1,14 +1,11 @@
 package br.com.amedigital.weather.api.service;
 
 import br.com.amedigital.weather.api.controller.request.WeatherRequest;
-import br.com.amedigital.weather.api.controller.response.WavesWeatherResponse;
 import br.com.amedigital.weather.api.controller.response.WeatherResponse;
 import br.com.amedigital.weather.api.exception.NotFoundException;
-import br.com.amedigital.weather.api.mapper.WavesWeatherMapper;
 import br.com.amedigital.weather.api.mapper.WeatherMapper;
 import br.com.amedigital.weather.api.model.ErrorMessages;
 import br.com.amedigital.weather.api.model.NumberDaysWeather;
-import br.com.amedigital.weather.api.repository.WavesWeatherRepository;
 import br.com.amedigital.weather.api.repository.WeatherRepository;
 import br.com.amedigital.weather.api.service.partner.INPEClientService;
 import br.com.amedigital.weather.api.util.Util;
@@ -31,17 +28,10 @@ public class WeatherService {
 
     private final WeatherRepository weatherRepository;
 
-    private final WavesWeatherMapper wavesWeatherMapper;
-
-    private final WavesWeatherRepository wavesWeatherRepository;
-
-    public WeatherService(INPEClientService inpeClientService, WeatherRepository weatherRepository, WeatherMapper weatherMapper
-    ,WavesWeatherMapper wavesWeatherMapper, WavesWeatherRepository wavesWeatherRepository) {
+    public WeatherService(INPEClientService inpeClientService, WeatherRepository weatherRepository, WeatherMapper weatherMapper){
         this.inpeClientService = inpeClientService;
         this.weatherRepository = weatherRepository;
         this.mapper = weatherMapper;
-        this.wavesWeatherMapper = wavesWeatherMapper;
-        this.wavesWeatherRepository = wavesWeatherRepository;
     }
 
     public Flux<WeatherResponse> findWeatherToCity(Integer cityCode, Integer days) {
@@ -68,20 +58,8 @@ public class WeatherService {
                   .onErrorMap(throwable -> throwable);
     }
 
-    public Flux<WavesWeatherResponse> findWeatherWavesToCity(Integer cityCode, Integer day) {
-
-        return inpeClientService.findWeatherWavesToCity(cityCode, day)
-                .switchIfEmpty(Mono.error(new NotFoundException(ErrorMessages.GENERIC_NOT_FOUND_EXCEPTION)))
-                .flatMap(inpeWeatherCityResponse -> inpeWeatherCityResponse.getName().equals("undefined") ?
-                        Mono.error(new NotFoundException(ErrorMessages.GENERIC_NOT_FOUND_EXCEPTION)) : Mono.just(inpeWeatherCityResponse))
-                .flatMapMany(response -> wavesWeatherRepository.save(wavesWeatherMapper.INPEWavesWeatherCityResponseToEntity(response, cityCode)))
-                .doOnError(throwable -> LOG.error("=== Error finding weather to city with code: {} ===", cityCode))
-                .onErrorMap(throwable -> throwable)
-                .flatMap(entity -> Flux.just(wavesWeatherMapper.entityToResponse(entity)));
-    }
-
-    public Flux<WeatherResponse> findAll() {
-        return weatherRepository.findAll()
+    public Flux<WeatherResponse> findAll(WeatherRequest weather) {
+        return weatherRepository.findAll(weather)
                 .switchIfEmpty(Mono.error(new NotFoundException(ErrorMessages.GENERIC_NOT_FOUND_EXCEPTION)))
                 .doOnError(throwable -> LOG.error("=== Error finding all weather  ==="))
                 .onErrorMap(throwable -> throwable)
@@ -115,8 +93,9 @@ public class WeatherService {
 
     }
 
-    public Mono<Void> delete(String id) {
-          return findOne(id).flatMap(entity -> weatherRepository.delete(id))
+    public Mono<Void> softDelete(String id) {
+          return findOne(id)
+                  .flatMap(entity -> weatherRepository.softDelete(id))
                   .doOnError(throwable -> LOG.error("=== Error deleting weather ==="))
                   .onErrorMap(throwable -> throwable);
     }
